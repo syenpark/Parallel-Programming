@@ -93,8 +93,7 @@ int main(void) {
  *               b_p:  pointer to right endpoint               
  *               n_p:  pointer to number of trapezoids
  */
-void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p,
-      int* n_p) {
+void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p, int* n_p) {
 
    if (my_rank == 0) {
       printf("Enter a, b, and n\n");

@@ -30,21 +30,19 @@
 #include <mpi.h>
 
 /* Get the input values */
-void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p,
-      int* n_p);
+void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p, int* n_p);
 
 /* Calculate local integral  */
-double Trap(double left_endpt, double right_endpt, int trap_count, 
-   double base_len);    
+double Trap(double left_endpt, double right_endpt, int trap_count, double base_len);
 
 /* Function we're integrating */
 double f(double x); 
 
 int main(void) {
+   int source;
    int my_rank, comm_sz, n, local_n;   
    double a, b, h, local_a, local_b;
    double local_int, total_int;
-   int source; 
 
    /* Let the system do what it needs to start up MPI */
    MPI_Init(NULL, NULL);
@@ -69,13 +67,12 @@ int main(void) {
 
    /* Add up the integrals calculated by each process */
    if (my_rank != 0)
-      MPI_Send(&local_int, 1, MPI_DOUBLE, 0, 0, 
-            MPI_COMM_WORLD);
+      MPI_Send(&local_int, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
    else {
       total_int = local_int;
+
       for (source = 1; source < comm_sz; source++) {
-         MPI_Recv(&local_int, 1, MPI_DOUBLE, source, 0,
-            MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+         MPI_Recv(&local_int, 1, MPI_DOUBLE, source, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
          total_int += local_int;
       }
    }
@@ -83,8 +80,7 @@ int main(void) {
    /* Print the result */
    if (my_rank == 0) {
       printf("With n = %d trapezoids, our estimate\n", n);
-      printf("of the integral from %f to %f = %.15e\n",
-          a, b, total_int);
+      printf("of the integral from %f to %f = %.15e\n", a, b, total_int);
    }
 
    /* Shut down MPI */
@@ -103,25 +99,23 @@ int main(void) {
  *               b_p:  pointer to right endpoint               
  *               n_p:  pointer to number of trapezoids
  */
-void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p,
-      int* n_p) {
+void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p, int* n_p) {
+   int src = 0;
    int dest;
 
-   if (my_rank == 0) {
+   if (my_rank == src) {
       printf("Enter a, b, and n\n");
       scanf("%lf %lf %d", a_p, b_p, n_p);
+
       for (dest = 1; dest < comm_sz; dest++) {
-         MPI_Send(a_p, 1, MPI_DOUBLE, dest, 0, MPI_COMM_WORLD);
-         MPI_Send(b_p, 1, MPI_DOUBLE, dest, 0, MPI_COMM_WORLD);
-         MPI_Send(n_p, 1, MPI_INT, dest, 0, MPI_COMM_WORLD);
+         MPI_Send(a_p, 1, MPI_DOUBLE, dest, 777, MPI_COMM_WORLD);
+         MPI_Send(b_p, 1, MPI_DOUBLE, dest, 777, MPI_COMM_WORLD);
+         MPI_Send(n_p, 1, MPI_INT, dest, 777, MPI_COMM_WORLD);
       } 
    } else { /* my_rank != 0 */
-      MPI_Recv(a_p, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD,
-            MPI_STATUS_IGNORE);
-      MPI_Recv(b_p, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD,
-            MPI_STATUS_IGNORE);
-      MPI_Recv(n_p, 1, MPI_INT, 0, 0, MPI_COMM_WORLD,
-            MPI_STATUS_IGNORE);
+      MPI_Recv(a_p, 1, MPI_DOUBLE, src, 777, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(b_p, 1, MPI_DOUBLE, src, 777, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(n_p, 1, MPI_INT, src, 777, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
    } 
 }  /* Get_input */
 
