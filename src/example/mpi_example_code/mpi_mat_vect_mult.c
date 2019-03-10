@@ -424,7 +424,7 @@ void Mat_vect_mult(
 
    for (local_i = 0; local_i < local_m; local_i++) {
       local_y[local_i] = 0.0;
-      
+
       for (j = 0; j < n; j++)
          local_y[local_i] += local_A[local_i*n+j]*x[j];
    }

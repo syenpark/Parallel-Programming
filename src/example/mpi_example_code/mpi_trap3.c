@@ -30,12 +30,10 @@
 #include <mpi.h>
 
 /* Get the input values */
-void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p,
-      int* n_p);
+void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p, int* n_p);
 
 /* Calculate local integral  */
-double Trap(double left_endpt, double right_endpt, int trap_count, 
-   double base_len);    
+double Trap(double left_endpt, double right_endpt, int trap_count, double base_len);
 
 /* Function we're integrating */
 double f(double x); 
