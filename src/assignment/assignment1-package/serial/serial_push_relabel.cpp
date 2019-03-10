@@ -19,14 +19,17 @@ void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
 }
 
 int push_relabel(int N, int src, int sink, int *cap, int *flow) {
+    // broad cast all arguments MPI broadcast
     int *dist = (int *) calloc(N, sizeof(int));
     int *stash_dist = (int *) calloc(N, sizeof(int));
     auto *excess = (int64_t *) calloc(N, sizeof(int64_t));
     auto *stash_excess = (int64_t *) calloc(N, sizeof(int64_t));
 
     // PreFlow.
+    // PreFlow first and broadcast recompute..?
     pre_flow(dist, excess, cap, flow, N, src);
 
+    // for all the procedure
     vector<int> active_nodes;
     int *stash_send = (int *) calloc(N * N, sizeof(int));
     for (auto u = 0; u < N; u++) {

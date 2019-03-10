@@ -1,7 +1,7 @@
 /**
- * Name:
+ * Name: Seoyoung Park
  * Student id:
- * ITSC email:
+ * ITSC email: sparkap@connect.ust.hk
 */
 
 

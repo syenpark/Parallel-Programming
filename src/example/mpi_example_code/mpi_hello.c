@@ -42,18 +42,16 @@ int main(void) {
 
    if (my_rank != 0) { 
       /* Create message */
-      sprintf(greeting, "Greetings from process %d of %d!", 
-            my_rank, comm_sz);
+      sprintf(greeting, "Greetings from process %d of %d!", my_rank, comm_sz);
       /* Send message to process 0 */
-      MPI_Send(greeting, strlen(greeting)+1, MPI_CHAR, 0, 0,
-            MPI_COMM_WORLD); 
+      MPI_Send(greeting, strlen(greeting)+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
    } else {  
       /* Print my message */
       printf("Greetings from process %d of %d!\n", my_rank, comm_sz);
+
       for (int q = 1; q < comm_sz; q++) {
          /* Receive message from process q */
-         MPI_Recv(greeting, MAX_STRING, MPI_CHAR, q,
-            0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+         MPI_Recv(greeting, MAX_STRING, MPI_CHAR, q, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
          /* Print message from process q */
          printf("%s\n", greeting);
       } 
