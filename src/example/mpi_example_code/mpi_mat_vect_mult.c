@@ -28,24 +28,14 @@
 #include <stdlib.h>
 #include <mpi.h>
 
-void Check_for_error(int local_ok, char fname[], char message[], 
-      MPI_Comm comm);
-void Get_dims(int* m_p, int* local_m_p, int* n_p, int* local_n_p,
-      int my_rank, int comm_sz, MPI_Comm comm);
-void Allocate_arrays(double** local_A_pp, double** local_x_pp, 
-      double** local_y_pp, int local_m, int n, int local_n, 
-      MPI_Comm comm);
-void Read_matrix(char prompt[], double local_A[], int m, int local_m, 
-      int n, int my_rank, MPI_Comm comm);
-void Read_vector(char prompt[], double local_vec[], int n, int local_n, 
-      int my_rank, MPI_Comm comm);
-void Print_matrix(char title[], double local_A[], int m, int local_m, 
-      int n, int my_rank, MPI_Comm comm);
-void Print_vector(char title[], double local_vec[], int n,
-      int local_n, int my_rank, MPI_Comm comm);
-void Mat_vect_mult(double local_A[], double local_x[], 
-      double local_y[], int local_m, int n, int local_n, 
-      MPI_Comm comm);
+void Check_for_error(int local_ok, char fname[], char message[], MPI_Comm comm);
+void Get_dims(int* m_p, int* local_m_p, int* n_p, int* local_n_p, int my_rank, int comm_sz, MPI_Comm comm);
+void Allocate_arrays(double** local_A_pp, double** local_x_pp, double** local_y_pp, int local_m, int n, int local_n, MPI_Comm comm);
+void Read_matrix(char prompt[], double local_A[], int m, int local_m, int n, int my_rank, MPI_Comm comm);
+void Read_vector(char prompt[], double local_vec[], int n, int local_n, int my_rank, MPI_Comm comm);
+void Print_matrix(char title[], double local_A[], int m, int local_m, int n, int my_rank, MPI_Comm comm);
+void Print_vector(char title[], double local_vec[], int n, int local_n, int my_rank, MPI_Comm comm);
+void Mat_vect_mult(double local_A[], double local_x[], double local_y[], int local_m, int n, int local_n, MPI_Comm comm);
 
 /*-------------------------------------------------------------------*/
 int main(void) {
@@ -111,11 +101,12 @@ void Check_for_error(
    if (ok == 0) {
       int my_rank;
       MPI_Comm_rank(comm, &my_rank);
+
       if (my_rank == 0) {
-         fprintf(stderr, "Proc %d > In %s, %s\n", my_rank, fname, 
-               message);
+         fprintf(stderr, "Proc %d > In %s, %s\n", my_rank, fname, message);
          fflush(stderr);
       }
+
       MPI_Finalize();
       exit(-1);
    }
@@ -157,13 +148,13 @@ void Get_dims(
       printf("Enter the number of columns\n");
       scanf("%d", n_p);
    }
+
    MPI_Bcast(m_p, 1, MPI_INT, 0, comm);
    MPI_Bcast(n_p, 1, MPI_INT, 0, comm);
-   if (*m_p <= 0 || *n_p <= 0 || *m_p % comm_sz != 0 
-         || *n_p % comm_sz != 0) local_ok = 0;
-   Check_for_error(local_ok, "Get_dims",
-      "m and n must be positive and evenly divisible by comm_sz", 
-      comm);
+
+   if (*m_p <= 0 || *n_p <= 0 || *m_p % comm_sz != 0 || *n_p % comm_sz != 0) local_ok = 0;
+
+   Check_for_error(local_ok, "Get_dims", "m and n must be positive and evenly divisible by comm_sz", comm);
 
    *local_m_p = *m_p/comm_sz;
    *local_n_p = *n_p/comm_sz;
@@ -202,10 +193,9 @@ void Allocate_arrays(
    *local_x_pp = malloc(local_n*sizeof(double));
    *local_y_pp = malloc(local_m*sizeof(double));
 
-   if (*local_A_pp == NULL || local_x_pp == NULL ||
-         local_y_pp == NULL) local_ok = 0;
-   Check_for_error(local_ok, "Allocate_arrays",
-         "Can't allocate local arrays", comm);
+   if (*local_A_pp == NULL || local_x_pp == NULL || local_y_pp == NULL) local_ok = 0;
+
+   Check_for_error(local_ok, "Allocate_arrays", "Can't allocate local arrays", comm);
 }  /* Allocate_arrays */
 
 /*-------------------------------------------------------------------
@@ -242,21 +232,21 @@ void Read_matrix(
 
    if (my_rank == 0) {
       A = malloc(m*n*sizeof(double));
+
       if (A == NULL) local_ok = 0;
-      Check_for_error(local_ok, "Read_matrix",
-            "Can't allocate temporary matrix", comm);
+
+      Check_for_error(local_ok, "Read_matrix", "Can't allocate temporary matrix", comm);
       printf("Enter the matrix %s\n", prompt);
+
       for (i = 0; i < m; i++)
          for (j = 0; j < n; j++)
             scanf("%lf", &A[i*n+j]);
-      MPI_Scatter(A, local_m*n, MPI_DOUBLE, 
-            local_A, local_m*n, MPI_DOUBLE, 0, comm);
+
+      MPI_Scatter(A, local_m*n, MPI_DOUBLE, local_A, local_m*n, MPI_DOUBLE, 0, comm);
       free(A);
    } else {
-      Check_for_error(local_ok, "Read_matrix",
-            "Can't allocate temporary matrix", comm);
-      MPI_Scatter(A, local_m*n, MPI_DOUBLE, 
-            local_A, local_m*n, MPI_DOUBLE, 0, comm);
+      Check_for_error(local_ok, "Read_matrix", "Can't allocate temporary matrix", comm);
+      MPI_Scatter(A, local_m*n, MPI_DOUBLE, local_A, local_m*n, MPI_DOUBLE, 0, comm);
    }
 }  /* Read_matrix */
 
@@ -288,19 +278,17 @@ void Read_vector(
    if (my_rank == 0) {
       vec = malloc(n*sizeof(double));
       if (vec == NULL) local_ok = 0;
-      Check_for_error(local_ok, "Read_vector",
-            "Can't allocate temporary vector", comm);
+      Check_for_error(local_ok, "Read_vector", "Can't allocate temporary vector", comm);
       printf("Enter the vector %s\n", prompt);
+
       for (i = 0; i < n; i++)
          scanf("%lf", &vec[i]);
-      MPI_Scatter(vec, local_n, MPI_DOUBLE,
-            local_vec, local_n, MPI_DOUBLE, 0, comm);
+
+      MPI_Scatter(vec, local_n, MPI_DOUBLE, local_vec, local_n, MPI_DOUBLE, 0, comm);
       free(vec);
    } else {
-      Check_for_error(local_ok, "Read_vector",
-            "Can't allocate temporary vector", comm);
-      MPI_Scatter(vec, local_n, MPI_DOUBLE,
-            local_vec, local_n, MPI_DOUBLE, 0, comm);
+      Check_for_error(local_ok, "Read_vector", "Can't allocate temporary vector", comm);
+      MPI_Scatter(vec, local_n, MPI_DOUBLE, local_vec, local_n, MPI_DOUBLE, 0, comm);
    }
 }  /* Read_vector */
 
@@ -333,24 +321,24 @@ void Print_matrix(
 
    if (my_rank == 0) {
       A = malloc(m*n*sizeof(double));
+
       if (A == NULL) local_ok = 0;
-      Check_for_error(local_ok, "Print_matrix",
-            "Can't allocate temporary matrix", comm);
-      MPI_Gather(local_A, local_m*n, MPI_DOUBLE,
-            A, local_m*n, MPI_DOUBLE, 0, comm);
+
+      Check_for_error(local_ok, "Print_matrix", "Can't allocate temporary matrix", comm);
+      MPI_Gather(local_A, local_m*n, MPI_DOUBLE, A, local_m*n, MPI_DOUBLE, 0, comm);
       printf("\nThe matrix %s\n", title);
+
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++)
             printf("%f ", A[i*n+j]);
          printf("\n");
       }
+
       printf("\n");
       free(A);
    } else {
-      Check_for_error(local_ok, "Print_matrix",
-            "Can't allocate temporary matrix", comm);
-      MPI_Gather(local_A, local_m*n, MPI_DOUBLE,
-            A, local_m*n, MPI_DOUBLE, 0, comm);
+      Check_for_error(local_ok, "Print_matrix", "Can't allocate temporary matrix", comm);
+      MPI_Gather(local_A, local_m*n, MPI_DOUBLE, A, local_m*n, MPI_DOUBLE, 0, comm);
    }
 }  /* Print_matrix */
 
@@ -381,21 +369,21 @@ void Print_vector(
 
    if (my_rank == 0) {
       vec = malloc(n*sizeof(double));
+
       if (vec == NULL) local_ok = 0;
-      Check_for_error(local_ok, "Print_vector",
-            "Can't allocate temporary vector", comm);
-      MPI_Gather(local_vec, local_n, MPI_DOUBLE,
-            vec, local_n, MPI_DOUBLE, 0, comm);
+
+      Check_for_error(local_ok, "Print_vector", "Can't allocate temporary vector", comm);
+      MPI_Gather(local_vec, local_n, MPI_DOUBLE, vec, local_n, MPI_DOUBLE, 0, comm);
       printf("\nThe vector %s\n", title);
+
       for (i = 0; i < n; i++)
          printf("%f ", vec[i]);
+
       printf("\n");
       free(vec);
    }  else {
-      Check_for_error(local_ok, "Print_vector",
-            "Can't allocate temporary vector", comm);
-      MPI_Gather(local_vec, local_n, MPI_DOUBLE,
-            vec, local_n, MPI_DOUBLE, 0, comm);
+      Check_for_error(local_ok, "Print_vector", "Can't allocate temporary vector", comm);
+      MPI_Gather(local_vec, local_n, MPI_DOUBLE, vec, local_n, MPI_DOUBLE, 0, comm);
    }
 }  /* Print_vector */
 
@@ -428,16 +416,18 @@ void Mat_vect_mult(
    int local_ok = 1;
 
    x = malloc(n*sizeof(double));
+
    if (x == NULL) local_ok = 0;
-   Check_for_error(local_ok, "Mat_vect_mult",
-         "Can't allocate temporary vector", comm);
-   MPI_Allgather(local_x, local_n, MPI_DOUBLE,
-         x, local_n, MPI_DOUBLE, comm);
+
+   Check_for_error(local_ok, "Mat_vect_mult", "Can't allocate temporary vector", comm);
+   MPI_Allgather(local_x, local_n, MPI_DOUBLE, x, local_n, MPI_DOUBLE, comm);
 
    for (local_i = 0; local_i < local_m; local_i++) {
       local_y[local_i] = 0.0;
+      
       for (j = 0; j < n; j++)
          local_y[local_i] += local_A[local_i*n+j]*x[j];
    }
+
    free(x);
 }  /* Mat_vect_mult */
