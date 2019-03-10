@@ -32,9 +32,30 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
     auto *excess = (int64_t *) calloc(N, sizeof(int64_t));
     auto *stash_excess = (int64_t *) calloc(N, sizeof(int64_t));
 
-    // PreFlow.
-    // PreFlow first and broadcast recompute..?
+    int *local_N = (int *) calloc(1, sizeof(int));
+    int *local_src = (int *) calloc(1, sizeof(int));
+    int *local_sink = (int *) calloc(1, sizeof(int));
+    int *local_cap = (int *) calloc(N, sizeof(int));
+    int *local_flow = (int *) calloc(N, sizeof(int));
+
+    // PreFlow
     pre_flow(dist, excess, cap, flow, N, src);
+
+    // Broadcast
+    if (my_rank == 0) {
+        *local_N = N;
+        *local_src = src;
+        *local_sink = sink;
+        *local_cap = *cap;
+        *local_flow = *flow;
+    }
+
+    MPI_Bcast(local_N, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(local_src, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(local_sink, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(local_cap, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(local_flow, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
 
     // for all the procedure
     vector<int> active_nodes;
@@ -109,6 +130,13 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
     free(excess);
     free(stash_excess);
     free(stash_send);
+
+
+    free(local_N);
+    free(local_src);
+    free(local_sink);
+    free(local_cap);
+    free(local_flow);
 
     return 0;
 }
