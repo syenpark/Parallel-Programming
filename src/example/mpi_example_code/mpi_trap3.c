@@ -30,12 +30,10 @@
 #include <mpi.h>
 
 /* Get the input values */
-void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p,
-      int* n_p);
+void Get_input(int my_rank, int comm_sz, double* a_p, double* b_p, int* n_p);
 
 /* Calculate local integral  */
-double Trap(double left_endpt, double right_endpt, int trap_count, 
-   double base_len);    
+double Trap(double left_endpt, double right_endpt, int trap_count, double base_len);
 
 /* Function we're integrating */
 double f(double x); 
@@ -67,14 +65,12 @@ int main(void) {
    local_int = Trap(local_a, local_b, local_n, h);
 
    /* Add up the integrals calculated by each process */
-   MPI_Reduce(&local_int, &total_int, 1, MPI_DOUBLE, MPI_SUM, 0,
-         MPI_COMM_WORLD);
+   MPI_Reduce(&local_int, &total_int, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
    /* Print the result */
    if (my_rank == 0) {
       printf("With n = %d trapezoids, our estimate\n", n);
-      printf("of the integral from %f to %f = %.15e\n",
-          a, b, total_int);
+      printf("of the integral from %f to %f = %.15e\n", a, b, total_int);
    }
 
    /* Shut down MPI */

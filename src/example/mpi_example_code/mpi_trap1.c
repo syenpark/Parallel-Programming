@@ -37,8 +37,8 @@ double f(double x);
 int main(void) {
    int source;
    int my_rank, comm_sz, n = 1024, local_n;   
-   double a = 0.0, b = 3.0, h, local_a, local_b;
-   double local_int, total_int;
+   double a = 0.0, b = 3.0;
+   double local_int, total_int, h, local_a, local_b;
 
    /* Let the system do what it needs to start up MPI */
    MPI_Init(NULL, NULL);

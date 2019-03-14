@@ -45,7 +45,8 @@ int main(void) {
       sprintf(greeting, "Greetings from process %d of %d!", my_rank, comm_sz);
       /* Send message to process 0 */
       MPI_Send(greeting, strlen(greeting)+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
-   } else {  
+   } else {
+      // STD out happens only here
       /* Print my message */
       printf("Greetings from process %d of %d!\n", my_rank, comm_sz);
 
