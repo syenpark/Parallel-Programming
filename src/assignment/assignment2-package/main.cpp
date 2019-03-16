@@ -16,7 +16,7 @@
 using namespace std;
 using namespace std::chrono;
 
-#include "push_relabel.h"
+#include "pthread_push_relabel.h"
 
 namespace utils {
     int N;
@@ -40,11 +40,9 @@ namespace utils {
         assert(N < (1024 * 20));
         cap = (int *) calloc(N * N, sizeof(int));
         flow = (int *) calloc(N * N, sizeof(int));
-
         while (inputf.good()) {
             int i, j;
             inputf >> i >> j;
-
             if (!inputf.good()) {
                 break;
             }
@@ -138,6 +136,7 @@ namespace utils {
 int main(int argc, char **argv) {
     assert(argc > 1 && "Input file was not found!");
     string filename = argv[1];
+    int num_threads = atoi(argv[2]);
     assert(utils::read_file(filename) == 0);
 
     int *cap_mat = (int *) malloc(utils::N * utils::N * sizeof(int));
@@ -145,16 +144,16 @@ int main(int argc, char **argv) {
 
     // Push relabel algorithm.
     auto start_clock = high_resolution_clock::now();
-    push_relabel(utils::N, utils::src, utils::sink, cap_mat, utils::flow);
+    push_relabel(num_threads, utils::N, utils::src, utils::sink, cap_mat, utils::flow);
     auto end_clock = high_resolution_clock::now();
-    fprintf(stderr, "Elapsed Time: %.9lf s\n", duration_cast<nanoseconds>(end_clock - start_clock).count() / pow(10, 9));
+    fprintf(stderr, "Elapsed Time: %.9lf s\n",
+            duration_cast<nanoseconds>(end_clock - start_clock).count() / pow(10, 9));
 
-    // Verify the validity of flow.
+    // Verify the validity of flow; Verify the maximum flow.
     int ret = utils::verify_valid_flow();
     if (ret != 0) {
-        fprintf(stderr, "err code: %d", ret);
+        fprintf(stderr, "err code: %d\n", ret);
     } else {
-        // Verify the maximum flow.
         if (utils::verify_maximum_flow() == -1) {
             fprintf(stderr, "not maximum flow, exist augmenting path on the residual network\n");
         } else {

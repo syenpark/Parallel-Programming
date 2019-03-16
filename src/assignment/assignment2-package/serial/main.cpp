@@ -40,11 +40,9 @@ namespace utils {
         assert(N < (1024 * 20));
         cap = (int *) calloc(N * N, sizeof(int));
         flow = (int *) calloc(N * N, sizeof(int));
-
         while (inputf.good()) {
             int i, j;
             inputf >> i >> j;
-
             if (!inputf.good()) {
                 break;
             }
@@ -147,7 +145,8 @@ int main(int argc, char **argv) {
     auto start_clock = high_resolution_clock::now();
     push_relabel(utils::N, utils::src, utils::sink, cap_mat, utils::flow);
     auto end_clock = high_resolution_clock::now();
-    fprintf(stderr, "Elapsed Time: %.9lf s\n", duration_cast<nanoseconds>(end_clock - start_clock).count() / pow(10, 9));
+    fprintf(stderr, "Elapsed Time: %.9lf s\n",
+            duration_cast<nanoseconds>(end_clock - start_clock).count() / pow(10, 9));
 
     // Verify the validity of flow.
     int ret = utils::verify_valid_flow();
