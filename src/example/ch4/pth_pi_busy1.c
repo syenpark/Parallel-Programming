@@ -60,12 +60,13 @@ int main(int argc, char* argv[]) {
    GET_TIME(start);
    sum = 0.0;
    flag = 0;
+
    for (thread = 0; thread < thread_count; thread++)  
-      pthread_create(&thread_handles[thread], NULL,
-          Thread_sum, (void*)thread);  
+      pthread_create(&thread_handles[thread], NULL, Thread_sum, (void*)thread);
 
    for (thread = 0; thread < thread_count; thread++) 
-      pthread_join(thread_handles[thread], NULL); 
+      pthread_join(thread_handles[thread], NULL);
+
    GET_TIME(finish);
    elapsed = finish - start;
 
@@ -99,6 +100,7 @@ void* Thread_sum(void* rank) {
    long my_rank = (long) rank;
    double factor;
    long long i;
+
    long long my_n = n/thread_count;
    long long my_first_i = my_n*my_rank;
    long long my_last_i = my_first_i + my_n;
