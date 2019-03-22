@@ -19,7 +19,6 @@ void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int loc_n, int sr
     dist[src] = loc_n;
 
     for (auto v = 0; v < loc_n; v++) {
-
         flow[utils::idx(src, v, loc_n)] = cap[utils::idx(src, v, loc_n)];
         flow[utils::idx(v, src, loc_n)] = -flow[utils::idx(src, v, loc_n)];
         excess[v] = flow[utils::idx(src, v, loc_n)];
