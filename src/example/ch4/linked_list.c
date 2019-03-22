@@ -98,13 +98,16 @@ int Insert(int value, struct list_node_s** head_pp) {
       temp_p = malloc(sizeof(struct list_node_s));
       temp_p->data = value;
       temp_p->next = curr_p;
+
       if (pred_p == NULL)
          *head_pp = temp_p;
       else
          pred_p->next = temp_p;
+
       return 1;
    } else { /* value in list */
       printf("%d is already in the list\n", value);
+
       return 0;
    }
 }  /* Insert */
@@ -120,10 +123,12 @@ void Print(struct list_node_s* head_p) {
    printf("list = ");
 
    curr_p = head_p;
+
    while (curr_p != (struct list_node_s*) NULL) {
       printf("%d ", curr_p->data);
       curr_p = curr_p->next;
    }
+
    printf("\n");
 }  /* Print */
 
@@ -139,12 +144,14 @@ int  Member(int value, struct list_node_s* head_p) {
    struct list_node_s* curr_p;
 
    curr_p = head_p;
+
    while (curr_p != NULL && curr_p->data < value)
       curr_p = curr_p->next;
 
    if (curr_p == NULL || curr_p->data > value) {
       printf("%d is not in the list\n", value);
       return 0;
+
    } else {
       printf("%d is in the list\n", value);
       return 1;
@@ -203,6 +210,7 @@ void Free_list(struct list_node_s** head_pp) {
    if (Is_empty(*head_pp)) return;
    curr_p = *head_pp; 
    succ_p = curr_p->next;
+
    while (succ_p != NULL) {
 #     ifdef DEBUG
       printf("Freeing %d\n", curr_p->data);

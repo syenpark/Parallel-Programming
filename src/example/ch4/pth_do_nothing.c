@@ -40,11 +40,11 @@ int main(int argc, char* argv[]) {
 
    GET_TIME(start);
    for (thread = 0; thread < thread_count; thread++)  
-      pthread_create(&thread_handles[thread], NULL,
-          Thread_function, NULL);  
+      pthread_create(&thread_handles[thread], NULL, Thread_function, NULL);
 
    for (thread = 0; thread < thread_count; thread++) 
-      pthread_join(thread_handles[thread], NULL); 
+      pthread_join(thread_handles[thread], NULL);
+
    GET_TIME(finish);
    elapsed = finish - start;
 

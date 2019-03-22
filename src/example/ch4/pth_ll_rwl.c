@@ -292,6 +292,7 @@ void* Thread_work(void* rank) {
    for (i = 0; i < ops_per_thread; i++) {
       which_op = my_drand(&seed);
       val = my_rand(&seed) % MAX_KEY;
+
       if (which_op < search_percent) {
          pthread_rwlock_rdlock(&rwlock);
          Member(val);

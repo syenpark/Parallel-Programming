@@ -45,6 +45,7 @@ int main(int argc, char* argv[]) {
 
    if (argc != 2)
       Usage(argv[0]);
+
    thread_count = strtol(argv[1], NULL, 10);
 
    thread_handles = malloc (thread_count*sizeof(pthread_t));
@@ -52,13 +53,14 @@ int main(int argc, char* argv[]) {
    pthread_cond_init(&ok_to_proceed, NULL);
 
    GET_TIME(start);
+
    for (thread = 0; thread < thread_count; thread++)
-      pthread_create(&thread_handles[thread], NULL,
-          Thread_work, (void*) thread);
+      pthread_create(&thread_handles[thread], NULL, Thread_work, (void*) thread);
 
    for (thread = 0; thread < thread_count; thread++) {
       pthread_join(thread_handles[thread], NULL);
    }
+
    GET_TIME(finish);
    printf("Elapsed time = %e seconds\n", finish - start);
 
@@ -98,11 +100,11 @@ void *Thread_work(void* rank) {
    for (i = 0; i < BARRIER_COUNT; i++) {
       pthread_mutex_lock(&barrier_mutex);
       barrier_thread_count++;
+
       if (barrier_thread_count == thread_count) {
          barrier_thread_count = 0;
 #        ifdef DEBUG
-         printf("Thread %ld > Signalling other threads in barrier %d\n", 
-               my_rank, i);
+         printf("Thread %ld > Signalling other threads in barrier %d\n", my_rank, i);
          fflush(stdout);
 #        endif
          pthread_cond_broadcast(&ok_to_proceed);
@@ -110,8 +112,7 @@ void *Thread_work(void* rank) {
          // Wait unlocks mutex and puts thread to sleep.
          //    Put wait in while loop in case some other
          // event awakens thread.
-         while (pthread_cond_wait(&ok_to_proceed,
-                   &barrier_mutex) != 0);
+         while (pthread_cond_wait(&ok_to_proceed, &barrier_mutex) != 0);
          // Mutex is relocked at this point.
 #        ifdef DEBUG
          printf("Thread %ld > Awakened in barrier %d\n", my_rank, i);

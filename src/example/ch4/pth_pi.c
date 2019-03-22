@@ -27,6 +27,7 @@
 
 const int MAX_THREADS = 1024;
 
+/* Global variables */
 long thread_count;
 long long n;
 double sum;
@@ -49,8 +50,7 @@ int main(int argc, char* argv[]) {
    sum = 0.0;
 
    for (thread = 0; thread < thread_count; thread++)  
-      pthread_create(&thread_handles[thread], NULL,
-          Thread_sum, (void*)thread);  
+      pthread_create(&thread_handles[thread], NULL, Thread_sum, (void*)thread);
 
    for (thread = 0; thread < thread_count; thread++) 
       pthread_join(thread_handles[thread], NULL); 
@@ -78,6 +78,7 @@ void* Thread_sum(void* rank) {
    long my_rank = (long) rank;
    double factor;
    long long i;
+
    long long my_n = n/thread_count;
    long long my_first_i = my_n*my_rank;
    long long my_last_i = my_first_i + my_n;
@@ -108,6 +109,7 @@ double Serial_pi(long long n) {
    for (i = 0; i < n; i++, factor = -factor) {
       sum += factor/(2*i+1);
    }
+
    return 4.0*sum;
 
 }  /* Serial_pi */

@@ -60,12 +60,13 @@ int main(int argc, char* argv[]) {
    GET_TIME(start);
    sum = 0.0;
    flag = 0;
+
    for (thread = 0; thread < thread_count; thread++)  
-      pthread_create(&thread_handles[thread], NULL,
-          Thread_sum, (void*)thread);  
+      pthread_create(&thread_handles[thread], NULL, Thread_sum, (void*)thread);
 
    for (thread = 0; thread < thread_count; thread++) 
-      pthread_join(thread_handles[thread], NULL); 
+      pthread_join(thread_handles[thread], NULL);
+
    GET_TIME(finish);
    elapsed = finish - start;
 
@@ -80,8 +81,7 @@ int main(int argc, char* argv[]) {
    elapsed = finish - start;
    printf("   Single-threaded estimate of pi = %.15f\n", sum);
    printf("   Elapsed time = %e seconds\n", elapsed);
-   printf("   Math library estimate of pi    = %.15f\n", 
-       4.0*atan(1.0));
+   printf("   Math library estimate of pi    = %.15f\n", 4.0*atan(1.0));
    
    free(thread_handles);
    return 0;

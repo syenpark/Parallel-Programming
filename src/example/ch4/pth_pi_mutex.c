@@ -57,12 +57,13 @@ int main(int argc, char* argv[]) {
    sum = 0.0;
 
    GET_TIME(start);
+
    for (thread = 0; thread < thread_count; thread++)  
-      pthread_create(&thread_handles[thread], NULL,
-          Thread_sum, (void*)thread);  
+      pthread_create(&thread_handles[thread], NULL, Thread_sum, (void*)thread);
 
    for (thread = 0; thread < thread_count; thread++) 
-      pthread_join(thread_handles[thread], NULL); 
+      pthread_join(thread_handles[thread], NULL);
+
    GET_TIME(finish);
    elapsed = finish - start;
 

@@ -99,10 +99,12 @@ int main(int argc, char* argv[]) {
    /* 2*inserts_in_main attempts.                           */
    i = attempts = 0;
    pthread_mutex_init(&head_mutex, NULL);
+
    while ( i < inserts_in_main && attempts < 2*inserts_in_main ) {
       key = my_rand(&seed) % MAX_KEY;
       success = Insert(key);
       attempts++;
+
       if (success) i++;
    }
    printf("Inserted %ld keys in empty list\n", i);
@@ -117,12 +119,15 @@ int main(int argc, char* argv[]) {
    pthread_mutex_init(&count_mutex, NULL);
 
    GET_TIME(start);
+
    for (i = 0; i < thread_count; i++)
       pthread_create(&thread_handles[i], NULL, Thread_work, (void*) i);
 
    for (i = 0; i < thread_count; i++)
       pthread_join(thread_handles[i], NULL);
+
    GET_TIME(finish);
+
    printf("Elapsed time = %e seconds\n", finish - start);
    printf("Total ops = %d\n", total_ops);
    printf("member ops = %d\n", member_total);
@@ -173,6 +178,7 @@ void Init_ptrs(struct list_node_s** curr_pp, struct list_node_s** pred_pp) {
    *pred_pp = NULL;
    pthread_mutex_lock(&head_mutex);
    *curr_pp = head;
+
    if (head != NULL)
       pthread_mutex_lock(&(head->mutex));
 }  /* Init_ptrs */
@@ -233,6 +239,7 @@ int Insert(int value) {
       pthread_mutex_init(&(temp->mutex), NULL);
       temp->data = value;
       temp->next = curr;
+
       if (curr != NULL) 
          pthread_mutex_unlock(&(curr->mutex));
       if (pred == NULL) {
@@ -264,6 +271,7 @@ void Print(void) {
    printf("list = ");
 
    temp = head;
+
    while (temp != (struct list_node_s*) NULL) {
       printf("%d ", temp->data);
       temp = temp->next;
@@ -278,11 +286,13 @@ int  Member(int value) {
 
    pthread_mutex_lock(&head_mutex);
    temp = head;
+
    while (temp != NULL && temp->data < value) {
       if (temp->next != NULL) 
          pthread_mutex_lock(&(temp->next->mutex));
       if (temp == head)
          pthread_mutex_unlock(&head_mutex);
+
       pthread_mutex_unlock(&(temp->mutex));
       temp = temp->next;
    }

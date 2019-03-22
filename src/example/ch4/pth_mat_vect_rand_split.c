@@ -199,6 +199,7 @@ void *Pth_mat_vect(void* rank) {
    GET_TIME(start);
    for (i = my_first_row; i < my_last_row; i++) {
       y[i] = 0.0;
+
       for (j = 0; j < n; j++) {
           temp = A[sub++];
           temp *= x[j];

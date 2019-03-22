@@ -17,6 +17,7 @@ using namespace std;
 
 void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int loc_n, int src) {
     dist[src] = loc_n;
+
     for (auto v = 0; v < loc_n; v++) {
         flow[utils::idx(src, v, loc_n)] = cap[utils::idx(src, v, loc_n)];
         flow[utils::idx(v, src, loc_n)] = -flow[utils::idx(src, v, loc_n)];
@@ -31,11 +32,13 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
     int loc_n;
     int loc_src;
     int loc_sink;
+
     if (my_rank == ROOT) {
         loc_n = N;
         loc_src = src;
         loc_sink = sink;
     }
+
     MPI_Bcast(&loc_n, 1, MPI_INT, ROOT, comm);
     MPI_Bcast(&loc_src, 1, MPI_INT, ROOT, comm);
     MPI_Bcast(&loc_sink, 1, MPI_INT, ROOT, comm);
@@ -54,6 +57,7 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
         memcpy(loc_cap, cap, sizeof(int) * loc_n * loc_n);
         memcpy(loc_flow, flow, sizeof(int) * loc_n * loc_n);
     }
+
     MPI_Bcast(loc_cap, loc_n * loc_n, MPI_INT, ROOT, comm);
     MPI_Bcast(loc_flow, loc_n * loc_n, MPI_INT, ROOT, comm);
 
@@ -61,6 +65,7 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
     pre_flow(dist, excess, loc_cap, loc_flow, loc_n, src);
 
     vector<int> active_nodes;
+
     for (auto u = 0; u < loc_n; u++) {
         if (u != loc_src && u != loc_sink) {
             active_nodes.emplace_back(u);
@@ -76,9 +81,10 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
 
         for (auto nodes_it = nodes_beg; nodes_it < nodes_end; nodes_it++) {
             auto u = active_nodes[nodes_it];
+
             for (auto v = 0; v < loc_n; v++) {
-                auto residual_cap = loc_cap[utils::idx(u, v, loc_n)] -
-                                    loc_flow[utils::idx(u, v, loc_n)];
+                auto residual_cap = loc_cap[utils::idx(u, v, loc_n)] - loc_flow[utils::idx(u, v, loc_n)];
+
                 if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
                     stash_send[utils::idx(u, v, loc_n)] = std::min<int64_t>(excess[u], residual_cap);
                     excess[u] -= stash_send[utils::idx(u, v, loc_n)];
@@ -99,11 +105,13 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
         for (auto nodes_it = 0; nodes_it < active_nodes.size(); nodes_it++) {
             auto u = active_nodes[nodes_it];
             bool needs_update = !(nodes_it >= nodes_beg && nodes_it < nodes_end);
+
             for (auto v = 0; v < loc_n; v++) {
                 if (stash_send[utils::idx(u, v, loc_n)] > 0) {
                     if (needs_update) {
                         excess[u] -= stash_send[utils::idx(u, v, loc_n)];
                     }
+
                     loc_flow[utils::idx(u, v, loc_n)] += stash_send[utils::idx(u, v, loc_n)];
                     loc_flow[utils::idx(v, u, loc_n)] -= stash_send[utils::idx(u, v, loc_n)];
                     stash_excess[v] += stash_send[utils::idx(u, v, loc_n)];
@@ -114,12 +122,16 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
 
         // Stage 2: relabel (update dist to stash_dist).
         memcpy(stash_dist, dist, loc_n * sizeof(int));
+
         for (auto nodes_it = nodes_beg; nodes_it < nodes_end; nodes_it++) {
             auto u = active_nodes[nodes_it];
+
             if (excess[u] > 0) {
                 int min_dist = INT32_MAX;
+
                 for (auto v = 0; v < loc_n; v++) {
                     auto residual_cap = loc_cap[utils::idx(u, v, loc_n)] - loc_flow[utils::idx(u, v, loc_n)];
+
                     if (residual_cap > 0) {
                         min_dist = min(min_dist, dist[v]);
                         stash_dist[u] = min_dist + 1;
@@ -145,6 +157,7 @@ int push_relabel(int my_rank, int p, MPI_Comm comm, int N, int src, int sink, in
                 active_nodes.emplace_back(u);
             }
         }
+        
         MPI_Barrier(comm);
     }
 
