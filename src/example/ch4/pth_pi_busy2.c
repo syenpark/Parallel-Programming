@@ -81,8 +81,7 @@ int main(int argc, char* argv[]) {
    elapsed = finish - start;
    printf("   Single-threaded estimate of pi = %.15f\n", sum);
    printf("   Elapsed time = %e seconds\n", elapsed);
-   printf("   Math library estimate of pi    = %.15f\n", 
-       4.0*atan(1.0));
+   printf("   Math library estimate of pi    = %.15f\n", 4.0*atan(1.0));
    
    free(thread_handles);
    return 0;
