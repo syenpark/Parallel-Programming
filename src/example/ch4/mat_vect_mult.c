@@ -40,10 +40,12 @@ int main(void) {
    A = malloc(m*n*sizeof(double));
    x = malloc(n*sizeof(double));
    y = malloc(m*sizeof(double));
+
    if (A == NULL || x == NULL || y == NULL) {
       fprintf(stderr, "Can't allocate storage\n");
       exit(-1);
    }
+
    Read_matrix("A", A, m, n);
 #  ifdef DEBUG
    Print_matrix("A", A, m, n);
@@ -73,9 +75,7 @@ int main(void) {
  * Errors:     If one of the dimensions isn't positive, the program
  *             prints an error and quits
  */
-void Get_dims(
-              int*  m_p  /* out */, 
-              int*  n_p  /* out */) {
+void Get_dims(int*  m_p  /* out */, int*  n_p  /* out */) {
    printf("Enter the number of rows\n");
    scanf("%d", m_p);
    printf("Enter the number of columns\n");
@@ -103,6 +103,7 @@ void Read_matrix(
    int i, j;
 
    printf("Enter the matrix %s\n", prompt);
+
    for (i = 0; i < m; i++)
       for (j = 0; j < n; j++)
          scanf("%lf", &A[i*n+j]);
@@ -122,6 +123,7 @@ void Read_vector(
    int i;
 
    printf("Enter the vector %s\n", prompt);
+
    for (i = 0; i < n; i++)
       scanf("%lf", &x[i]);
 }  /* Read_vector */
@@ -143,6 +145,7 @@ void Print_matrix(
    int i, j;
 
    printf("\nThe matrix %s\n", title);
+
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++)
          printf("%f ", A[i*n+j]);
@@ -164,6 +167,7 @@ void Print_vector(
    int i;
 
    printf("\nThe vector %s\n", title);
+
    for (i = 0; i < m; i++)
       printf("%f ", y[i]);
    printf("\n");
@@ -189,6 +193,7 @@ void Mat_vect_mult(
 
    for (i = 0; i < m; i++) {
       y[i] = 0.0;
+
       for (j = 0; j < n; j++)
          y[i] += A[i*n+j]*x[j];
    }

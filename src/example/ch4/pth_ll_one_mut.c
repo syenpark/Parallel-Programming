@@ -170,6 +170,7 @@ int Insert(int value) {
       temp = malloc(sizeof(struct list_node_s));
       temp->data = value;
       temp->next = curr;
+
       if (pred == NULL)
          head = temp;
       else
@@ -188,6 +189,7 @@ void Print(void) {
    printf("list = ");
 
    temp = head;
+
    while (temp != (struct list_node_s*) NULL) {
       printf("%d ", temp->data);
       temp = temp->next;
@@ -294,6 +296,7 @@ void* Thread_work(void* rank) {
    for (i = 0; i < ops_per_thread; i++) {
       which_op = my_drand(&seed);
       val = my_rand(&seed) % MAX_KEY;
+
       if (which_op < search_percent) {
          pthread_mutex_lock(&mutex);
          Member(val);

@@ -51,13 +51,14 @@ int main(int argc, char* argv[]) {
    sems = (sem_t*) malloc(thread_count*sizeof(sem_t));
    // sems[0] should be unlocked, the others should be locked
    sem_init(&sems[0], 0, 1);
+
    for (thread = 1; thread < thread_count; thread++)
       sem_init(&sems[thread], 0, 0);
 
    printf("Enter text\n");
+
    for (thread = 0; thread < thread_count; thread++)
-      pthread_create(&thread_handles[thread], (pthread_attr_t*) NULL,
-          Tokenize, (void*) thread);
+      pthread_create(&thread_handles[thread], (pthread_attr_t*) NULL, Tokenize, (void*) thread);
 
    for (thread = 0; thread < thread_count; thread++) {
       pthread_join(thread_handles[thread], NULL);
@@ -103,12 +104,14 @@ void *Tokenize(void* rank) {
    /* Force sequential reading of the input */
    sem_wait(&sems[my_rank]);  
    fg_rv = fgets(my_line, MAX, stdin);
-   sem_post(&sems[next]);  
+   sem_post(&sems[next]);
+
    while (fg_rv != NULL) {
       printf("Thread %ld > my line = %s", my_rank, my_line);
 
       count = 0; 
       my_string = strtok_r(my_line, " \t\n", &saveptr);
+
       while ( my_string != NULL ) {
          count++;
          printf("Thread %ld > string %d = %s\n", my_rank, count, my_string);

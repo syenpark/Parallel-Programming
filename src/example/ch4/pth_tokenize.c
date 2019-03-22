@@ -48,19 +48,21 @@ int main(int argc, char* argv[]) {
 
    if (argc != 2)
       Usage(argv[0]);
+
    thread_count = atoi(argv[1]);
 
    thread_handles = (pthread_t*) malloc (thread_count*sizeof(pthread_t));
    sems = (sem_t*) malloc(thread_count*sizeof(sem_t));
    // sems[0] should be unlocked, the others should be locked
    sem_init(&sems[0], 0, 1);
+
    for (thread = 1; thread < thread_count; thread++)
       sem_init(&sems[thread], 0, 0);
 
    printf("Enter text\n");
+
    for (thread = 0; thread < thread_count; thread++)
-      pthread_create(&thread_handles[thread], (pthread_attr_t*) NULL,
-          Tokenize, (void*) thread);
+      pthread_create(&thread_handles[thread], (pthread_attr_t*) NULL, Tokenize, (void*) thread);
 
    for (thread = 0; thread < thread_count; thread++) {
       pthread_join(thread_handles[thread], NULL);
@@ -111,13 +113,14 @@ void *Tokenize(void* rank) {
 
       count = 0; 
       my_string = strtok(my_line, " \t\n");
+
       while ( my_string != NULL ) {
          count++;
          printf("Thread %ld > string %d = %s\n", my_rank, count, my_string);
          my_string = strtok(NULL, " \t\n");
-      } 
-      if (my_line != NULL) printf("Thread %ld > After tokenizing, my_line = %s\n",
-        my_rank, my_line);
+      }
+
+      if (my_line != NULL) printf("Thread %ld > After tokenizing, my_line = %s\n", my_rank, my_line);
 
       sem_wait(&sems[my_rank]); 
       fg_rv = fgets(my_line, MAX, stdin);
