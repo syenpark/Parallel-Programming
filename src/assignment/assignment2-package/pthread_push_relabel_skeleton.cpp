@@ -1,7 +1,7 @@
 /**
- * Name:
+ * Name: Seoyoung Park
  * Student id:
- * ITSC email:
+ * ITSC email: sparkap@connect.ust.hk
 */
 #include <cstring>
 #include <cstdint>
@@ -20,11 +20,17 @@ using namespace std;
 
 void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
     dist[src] = N;
+
     for (auto v = 0; v < N; v++) {
         flow[utils::idx(src, v, N)] = cap[utils::idx(src, v, N)];
         flow[utils::idx(v, src, N)] = -flow[utils::idx(src, v, N)];
         excess[v] = flow[utils::idx(src, v, N)];
     }
+}
+
+void *Hello(void* rank) {
+    long my_rank = (long) rank;
+    printf("hello\n");
 }
 
 int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow) {
@@ -36,6 +42,15 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
     pthread_t* thread_handles;
 
     thread_handles = (pthread_t*) malloc (num_threads*sizeof(pthread_t));
+
+    for (thread = 0; thread < num_threads; thread++)
+        pthread_create(&thread_handles[thread], NULL, Hello, (void*) thread);
+
+    printf("Hello from the main thread\n");
+
+    // Stopping the threads
+    for (thread = 0; thread < num_threads; thread++)
+        pthread_join(thread_handles[thread], NULL);
 
     free(thread_handles);
 
