@@ -28,9 +28,14 @@ void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
     }
 }
 
+int flag = 0;
 void *Hello(void* rank) {
     long my_rank = (long) rank;
-    printf("hello\n");
+
+    while(flag != my_rank);
+    printf("hello %ld\n", my_rank);
+
+    flag += 1;
 }
 
 int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow) {
@@ -48,19 +53,13 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
 
     printf("Hello from the main thread\n");
 
-    // Stopping the threads
-    for (thread = 0; thread < num_threads; thread++)
-        pthread_join(thread_handles[thread], NULL);
-
-    free(thread_handles);
-
     // sequential
     // two for loop into one for loop
 
     // syncrhonization between step 1 and 2
 
     // pthread creat function
-    /*
+
     int *dist = (int *) calloc(N, sizeof(int));
     int *stash_dist = (int *) calloc(N, sizeof(int));
     auto *excess = (int64_t *) calloc(N, sizeof(int64_t));
@@ -71,15 +70,20 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
 
     vector<int> active_nodes;
     int *stash_send = (int *) calloc(N * N, sizeof(int));
+
     for (auto u = 0; u < N; u++) {
         if (u != src && u != sink) {
             active_nodes.emplace_back(u);
         }
     }
-
+    /*
     // Four-Stage Pulses.
     while (!active_nodes.empty()) {
         // Stage 1: push.
+        int avg = (active_nodes.size() + num_threads - 1) / num_threads;
+        int nodes_beg = avg * my_rank;
+        int nodes_end = min<int>(avg * (my_rank + 1), active_nodes.size());
+
         for (auto u : active_nodes) {
             for (auto v = 0; v < N; v++) {
                 auto residual_cap = cap[utils::idx(u, v, N)] -
@@ -135,12 +139,20 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
             }
         }
     }
+    */
 
     free(dist);
     free(stash_dist);
     free(excess);
     free(stash_excess);
     free(stash_send);
-    */
+
+
+    // Stopping the threads
+    for (thread = 0; thread < num_threads; thread++)
+        pthread_join(thread_handles[thread], NULL);
+
+    free(thread_handles);
+
     return 0;
 }
