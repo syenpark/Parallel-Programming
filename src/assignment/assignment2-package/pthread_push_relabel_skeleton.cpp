@@ -12,15 +12,20 @@
 
 #include "pthread_push_relabel.h"
 #include <pthread.h>
+#include <semaphore.h>
 
 /*
  *  You can add helper functions and variables as you wish.
  */
 using namespace std;
 
+/**/
+int counter = 0;
+pthread_mutex_t barrier_mutex;
+
 vector<int> active_nodes;
 int64_t *excess, *stash_excess;
-int *dist, *stash_dist, *stash_send;
+int *dist, *stash_dist, *stash_send, glob_num_threads, glob_N, glob_src, glob_sink, *glob_cap, *glob_flow;
 
 void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
     dist[src] = N;
@@ -31,11 +36,47 @@ void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
         excess[v] = flow[utils::idx(src, v, N)];
     }
 }
+void initialize_globs(int num_threads, int N, int src, int sink, int *cap, int *flow) {
+    glob_num_threads = num_threads;
+    glob_N = N;
+    glob_src = src;
+    glob_sink = sink;
+    glob_cap = cap;
+    glob_flow = flow;
+}
 
 void *Hello(void* rank) {
     long my_rank = (long) rank;
+    int avg = (active_nodes.size() + glob_num_threads - 1) / glob_num_threads;
+    int nodes_beg = avg * my_rank;
+    int nodes_end = min<int>(avg * (my_rank + 1), active_nodes.size());
 
-    printf("hello %ld\n", my_rank);
+    for (auto nodes_it = nodes_beg; nodes_it < nodes_end; nodes_it++) {
+        auto u = active_nodes[nodes_it];
+
+        for (auto v = 0; v < glob_N; v++) {
+            auto residual_cap = glob_cap[utils::idx(u, v, glob_N)] - glob_flow[utils::idx(u, v, glob_N)];
+
+            if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
+                stash_send[utils::idx(u, v, glob_N)] = std::min<int64_t>(excess[u], residual_cap);
+                excess[u] -= stash_send[utils::idx(u, v, glob_N)];
+            }
+
+            // barriers busy wait mutex
+            pthread_mutex_lock(&barrier_mutex);
+            counter++;
+            pthread_mutex_unlock(&barrier_mutex);
+            while (counter < glob_num_threads);
+
+            if (stash_send[utils::idx(u, v, glob_N)] > 0) {
+                glob_flow[utils::idx(u, v, glob_N)] += stash_send[utils::idx(u, v, glob_N)];
+                glob_flow[utils::idx(v, u, glob_N)] -= stash_send[utils::idx(u, v, glob_N)];
+                stash_excess[v] += stash_send[utils::idx(u, v, glob_N)];
+                stash_send[utils::idx(u, v, glob_N)] = 0;
+            }
+
+        }
+    }
 }
 
 int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow) {
@@ -54,6 +95,7 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
     // syncrhonization between step 1 and 2
 
     // pthread creat function
+    initialize_globs(num_threads, N, src, sink, cap, flow);
 
     dist = (int *) calloc(N, sizeof(int));
     stash_dist = (int *) calloc(N, sizeof(int));
@@ -71,38 +113,16 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
         }
     }
 
-    for (thread = 0; thread < num_threads; thread++)
-        pthread_create(&thread_handles[thread], NULL, Hello, (void*) thread);
-
     printf("Hello from the main thread\n");
 
     // Four-Stage Pulses.
     while (!active_nodes.empty()) {
         // Stage 1: push.
-        //int avg = (active_nodes.size() + num_threads - 1) / num_threads;
-        //int nodes_beg = avg * my_rank;
-        //int nodes_end = min<int>(avg * (my_rank + 1), active_nodes.size());
+        for (thread = 0; thread < num_threads; thread++)
+            pthread_create(&thread_handles[thread], NULL, Hello, (void*) thread);
 
-        for (auto u : active_nodes) {
-            for (auto v = 0; v < N; v++) {
-                auto residual_cap = cap[utils::idx(u, v, N)] - flow[utils::idx(u, v, N)];
-
-                if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
-                    stash_send[utils::idx(u, v, N)] = std::min<int64_t>(excess[u], residual_cap);
-                    excess[u] -= stash_send[utils::idx(u, v, N)];
-                }
-            }
-        }
-        for (auto u : active_nodes) {
-            for (auto v = 0; v < N; v++) {
-                if (stash_send[utils::idx(u, v, N)] > 0) {
-                    flow[utils::idx(u, v, N)] += stash_send[utils::idx(u, v, N)];
-                    flow[utils::idx(v, u, N)] -= stash_send[utils::idx(u, v, N)];
-                    stash_excess[v] += stash_send[utils::idx(u, v, N)];
-                    stash_send[utils::idx(u, v, N)] = 0;
-                }
-            }
-        }
+        for (thread = 0; thread < num_threads; thread++)
+            pthread_join(thread_handles[thread], NULL);
 
         // Stage 2: relabel (update dist to stash_dist).
         memcpy(stash_dist, dist, N * sizeof(int));
@@ -145,10 +165,11 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
     free(stash_excess);
     free(stash_send);
 
-
+    /*
     // Stopping the threads
     for (thread = 0; thread < num_threads; thread++)
         pthread_join(thread_handles[thread], NULL);
+    */
 
     free(thread_handles);
 
