@@ -18,6 +18,10 @@
  */
 using namespace std;
 
+vector<int> active_nodes;
+int64_t *excess, *stash_excess;
+int *dist, *stash_dist, *stash_send;
+
 void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
     dist[src] = N;
 
@@ -28,14 +32,10 @@ void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
     }
 }
 
-int flag = 0;
 void *Hello(void* rank) {
     long my_rank = (long) rank;
 
-    while(flag != my_rank);
     printf("hello %ld\n", my_rank);
-
-    flag += 1;
 }
 
 int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow) {
@@ -48,11 +48,6 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
 
     thread_handles = (pthread_t*) malloc (num_threads*sizeof(pthread_t));
 
-    for (thread = 0; thread < num_threads; thread++)
-        pthread_create(&thread_handles[thread], NULL, Hello, (void*) thread);
-
-    printf("Hello from the main thread\n");
-
     // sequential
     // two for loop into one for loop
 
@@ -60,22 +55,26 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
 
     // pthread creat function
 
-    int *dist = (int *) calloc(N, sizeof(int));
-    int *stash_dist = (int *) calloc(N, sizeof(int));
-    auto *excess = (int64_t *) calloc(N, sizeof(int64_t));
-    auto *stash_excess = (int64_t *) calloc(N, sizeof(int64_t));
+    dist = (int *) calloc(N, sizeof(int));
+    stash_dist = (int *) calloc(N, sizeof(int));
+    excess = (int64_t *) calloc(N, sizeof(int64_t));
+    stash_excess = (int64_t *) calloc(N, sizeof(int64_t));
 
     // PreFlow.
     pre_flow(dist, excess, cap, flow, N, src);
 
-    vector<int> active_nodes;
-    int *stash_send = (int *) calloc(N * N, sizeof(int));
+    stash_send = (int *) calloc(N * N, sizeof(int));
 
     for (auto u = 0; u < N; u++) {
         if (u != src && u != sink) {
             active_nodes.emplace_back(u);
         }
     }
+
+    for (thread = 0; thread < num_threads; thread++)
+        pthread_create(&thread_handles[thread], NULL, Hello, (void*) thread);
+
+    printf("Hello from the main thread\n");
     /*
     // Four-Stage Pulses.
     while (!active_nodes.empty()) {
