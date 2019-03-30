@@ -61,20 +61,6 @@ void *Hello(void* rank) {
                 stash_send[utils::idx(u, v, glob_N)] = std::min<int64_t>(excess[u], residual_cap);
                 excess[u] -= stash_send[utils::idx(u, v, glob_N)];
             }
-
-            // barriers busy wait mutex
-            pthread_mutex_lock(&barrier_mutex);
-            counter++;
-            pthread_mutex_unlock(&barrier_mutex);
-            while (counter < glob_num_threads);
-
-            if (stash_send[utils::idx(u, v, glob_N)] > 0) {
-                glob_flow[utils::idx(u, v, glob_N)] += stash_send[utils::idx(u, v, glob_N)];
-                glob_flow[utils::idx(v, u, glob_N)] -= stash_send[utils::idx(u, v, glob_N)];
-                stash_excess[v] += stash_send[utils::idx(u, v, glob_N)];
-                stash_send[utils::idx(u, v, glob_N)] = 0;
-            }
-
         }
     }
 }
@@ -113,8 +99,6 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
         }
     }
 
-    printf("Hello from the main thread\n");
-
     // Four-Stage Pulses.
     while (!active_nodes.empty()) {
         // Stage 1: push.
@@ -123,6 +107,17 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
 
         for (thread = 0; thread < num_threads; thread++)
             pthread_join(thread_handles[thread], NULL);
+
+        for (auto u : active_nodes) {
+            for (auto v = 0; v < N; v++) {
+                if (stash_send[utils::idx(u, v, N)] > 0) {
+                    flow[utils::idx(u, v, N)] += stash_send[utils::idx(u, v, N)];
+                    flow[utils::idx(v, u, N)] -= stash_send[utils::idx(u, v, N)];
+                    stash_excess[v] += stash_send[utils::idx(u, v, N)];
+                    stash_send[utils::idx(u, v, N)] = 0;
+                }
+            }
+        }
 
         // Stage 2: relabel (update dist to stash_dist).
         memcpy(stash_dist, dist, N * sizeof(int));
