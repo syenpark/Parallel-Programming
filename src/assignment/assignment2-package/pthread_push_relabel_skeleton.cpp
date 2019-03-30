@@ -75,18 +75,18 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
         pthread_create(&thread_handles[thread], NULL, Hello, (void*) thread);
 
     printf("Hello from the main thread\n");
-    /*
+
     // Four-Stage Pulses.
     while (!active_nodes.empty()) {
         // Stage 1: push.
-        int avg = (active_nodes.size() + num_threads - 1) / num_threads;
-        int nodes_beg = avg * my_rank;
-        int nodes_end = min<int>(avg * (my_rank + 1), active_nodes.size());
+        //int avg = (active_nodes.size() + num_threads - 1) / num_threads;
+        //int nodes_beg = avg * my_rank;
+        //int nodes_end = min<int>(avg * (my_rank + 1), active_nodes.size());
 
         for (auto u : active_nodes) {
             for (auto v = 0; v < N; v++) {
-                auto residual_cap = cap[utils::idx(u, v, N)] -
-                                    flow[utils::idx(u, v, N)];
+                auto residual_cap = cap[utils::idx(u, v, N)] - flow[utils::idx(u, v, N)];
+
                 if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
                     stash_send[utils::idx(u, v, N)] = std::min<int64_t>(excess[u], residual_cap);
                     excess[u] -= stash_send[utils::idx(u, v, N)];
@@ -138,7 +138,6 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
             }
         }
     }
-    */
 
     free(dist);
     free(stash_dist);
