@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
 
    thread_handles = (pthread_t*) malloc (thread_count*sizeof(pthread_t));
    messages = (char**) malloc(thread_count*sizeof(char*));
+
    for (thread = 0; thread < thread_count; thread++)
       messages[thread] = NULL;
 
@@ -61,8 +62,7 @@ int main(int argc, char* argv[]) {
    }
 
    for (thread = 0; thread < thread_count; thread++)
-      pthread_create(&thread_handles[thread], NULL,
-          Send_msg, (void*) thread);
+      pthread_create(&thread_handles[thread], NULL, Send_msg, (void*) thread);
 
    for (thread = 0; thread < thread_count; thread++) {
       pthread_join(thread_handles[thread], NULL);
