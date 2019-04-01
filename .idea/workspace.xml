@@ -26,8 +26,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="136" column="43" selection-start-line="136" selection-start-column="30" selection-end-line="136" selection-end-column="43" />
+            <state relative-caret-position="356">
+              <caret line="134" column="46" selection-start-line="134" selection-start-column="46" selection-end-line="134" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -57,10 +57,11 @@
       <find>cap</find>
       <find>unlock</find>
       <find>thread_count</find>
-      <find>counter</find>
       <find>bar</find>
       <find>ok_to_proceed</find>
       <find>barrier_mutex</find>
+      <find>ok_to_pro</find>
+      <find>counter</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -226,12 +227,12 @@
       <workItem from="1553780311677" duration="1253000" />
       <workItem from="1553946470605" duration="4566000" />
       <workItem from="1554118094594" duration="925000" />
-      <workItem from="1554136993873" duration="3144000" />
+      <workItem from="1554136993873" duration="3722000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31631000" />
+    <option name="totallyTimeSpent" value="32209000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-199" y="29" width="1220" height="859" extended-state="0" />
@@ -512,15 +513,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="136" column="43" selection-start-line="136" selection-start-column="30" selection-end-line="136" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Downloads/pthread_push_relabel_skeleton.cpp">
       <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="356">
+          <caret line="134" column="46" selection-start-line="134" selection-start-column="46" selection-end-line="134" selection-end-column="46" />
+        </state>
+      </provider>
     </entry>
   </component>
 </project>

@@ -104,16 +104,12 @@ void *Hello(void* rank) {
             dist[u] = stash_dist[u];
         }
 
-        //free(stash_dist);
-
         // Barrier
         // Stage 4: apply excess-flow changes for destination vertices.
         pthread_mutex_lock(&barrier_mutex);
         counter++;
 
         if (counter == glob_num_threads) {
-            counter = 0;
-
             for (auto v = 0; v < glob_N; v++) {
                 if (stash_excess[v] != 0) {
                     excess[v] += stash_excess[v];
@@ -131,11 +127,12 @@ void *Hello(void* rank) {
             }
 
             pthread_cond_broadcast(&ok_to_proceed);
+            counter = 0;
         } else {
             while (pthread_cond_wait(&ok_to_proceed, &barrier_mutex) != 0);
         }
-        pthread_mutex_unlock(&barrier_mutex);
 
+        pthread_mutex_unlock(&barrier_mutex);
     }
 }
 
