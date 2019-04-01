@@ -10,7 +10,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a193fa77-9e09-417d-94f4-843721af4272" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,8 +26,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="394">
-              <caret line="82" lean-forward="true" selection-start-line="82" selection-end-line="82" />
+            <state relative-caret-position="165">
+              <caret line="136" column="43" selection-start-line="136" selection-start-column="30" selection-end-line="136" selection-end-column="43" />
             </state>
           </provider>
         </entry>
@@ -59,6 +58,9 @@
       <find>unlock</find>
       <find>thread_count</find>
       <find>counter</find>
+      <find>bar</find>
+      <find>ok_to_proceed</find>
+      <find>barrier_mutex</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -97,8 +99,8 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
-    <option name="x" value="-65" />
-    <option name="y" value="41" />
+    <option name="x" value="-199" />
+    <option name="y" value="29" />
     <option name="width" value="1220" />
     <option name="height" value="859" />
   </component>
@@ -224,15 +226,15 @@
       <workItem from="1553780311677" duration="1253000" />
       <workItem from="1553946470605" duration="4566000" />
       <workItem from="1554118094594" duration="925000" />
-      <workItem from="1554136993873" duration="1401000" />
+      <workItem from="1554136993873" duration="3144000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29888000" />
+    <option name="totallyTimeSpent" value="31631000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-65" y="41" width="1220" height="859" extended-state="0" />
+    <frame x="-199" y="29" width="1220" height="859" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.31663838" />
@@ -512,8 +514,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
-          <caret line="82" lean-forward="true" selection-start-line="82" selection-end-line="82" />
+        <state relative-caret-position="165">
+          <caret line="136" column="43" selection-start-line="136" selection-start-column="30" selection-end-line="136" selection-end-column="43" />
         </state>
       </provider>
     </entry>
