@@ -19,8 +19,7 @@
  */
 using namespace std;
 
-/**/
-int counter = 0;
+/* Global Variables */
 pthread_mutex_t barrier_mutex;
 
 vector<int> active_nodes;
@@ -59,7 +58,16 @@ void *Hello(void* rank) {
 
             if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
                 stash_send[utils::idx(u, v, glob_N)] = std::min<int64_t>(excess[u], residual_cap);
-                excess[u] -= stash_send[utils::idx(u, v, glob_N)];
+
+                if (stash_send[utils::idx(u, v, glob_N)] > 0) {
+                    excess[u] -= stash_send[utils::idx(u, v, glob_N)];
+                    glob_flow[utils::idx(u, v, glob_N)] += stash_send[utils::idx(u, v, glob_N)];
+                    glob_flow[utils::idx(v, u, glob_N)] -= stash_send[utils::idx(u, v, glob_N)];
+                    pthread_mutex_lock(&barrier_mutex);
+                    stash_excess[v] += stash_send[utils::idx(u, v, glob_N)];
+                    pthread_mutex_unlock(&barrier_mutex);
+                    stash_send[utils::idx(u, v, glob_N)] = 0;
+                }
             }
         }
     }
@@ -107,17 +115,6 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
 
         for (thread = 0; thread < num_threads; thread++)
             pthread_join(thread_handles[thread], NULL);
-
-        for (auto u : active_nodes) {
-            for (auto v = 0; v < N; v++) {
-                if (stash_send[utils::idx(u, v, N)] > 0) {
-                    flow[utils::idx(u, v, N)] += stash_send[utils::idx(u, v, N)];
-                    flow[utils::idx(v, u, N)] -= stash_send[utils::idx(u, v, N)];
-                    stash_excess[v] += stash_send[utils::idx(u, v, N)];
-                    stash_send[utils::idx(u, v, N)] = 0;
-                }
-            }
-        }
 
         // Stage 2: relabel (update dist to stash_dist).
         memcpy(stash_dist, dist, N * sizeof(int));
@@ -170,3 +167,6 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
 
     return 0;
 }
+
+
+
