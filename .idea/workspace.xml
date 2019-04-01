@@ -27,8 +27,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-883">
-              <caret line="102" lean-forward="true" selection-start-line="102" selection-end-line="102" />
+            <state relative-caret-position="105">
+              <caret line="7" column="18" lean-forward="true" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -89,6 +89,7 @@
       <find>barrier_mutex</find>
       <find>ok_to_pro</find>
       <find>counter</find>
+      <find>count_s</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -256,12 +257,12 @@
       <workItem from="1554118094594" duration="925000" />
       <workItem from="1554136993873" duration="4991000" />
       <workItem from="1554142233071" duration="27000" />
-      <workItem from="1554142908525" duration="1256000" />
+      <workItem from="1554142908525" duration="1391000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="34761000" />
+    <option name="totallyTimeSpent" value="34896000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-32" y="23" width="1220" height="859" extended-state="0" />
@@ -552,8 +553,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-883">
-          <caret line="102" lean-forward="true" selection-start-line="102" selection-end-line="102" />
+        <state relative-caret-position="105">
+          <caret line="7" column="18" lean-forward="true" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
         </state>
       </provider>
     </entry>
