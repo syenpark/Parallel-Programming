@@ -19,8 +19,10 @@ using namespace std;
 /* Global Variables */
 vector<int> active_nodes;
 int64_t *excess, *stash_excess;
+sem_t count_sem, barrier_sem;
 pthread_mutex_t barrier_mutex;
 pthread_cond_t unlock_barrier_signal;
+
 int counter = 0, *dist, *stash_dist, *stash_send, glob_num_threads, glob_N, glob_src, glob_sink, *glob_cap, *glob_flow;
 
 void initialize_globs(int num_threads, int N, int src, int sink, int *cap, int *flow) {
@@ -99,12 +101,14 @@ void *Hello(void* rank) {
             dist[u] = stash_dist[u];
         }
 
-        // Barrier with condition variable
+        // Barrier with semaphore
         // Stage 4: apply excess-flow changes for destination vertices.
-        pthread_mutex_lock(&barrier_mutex);
-        counter++;
+        sem_wait(&count_sem);
 
-        if (counter == glob_num_threads) {
+        if (counter == glob_num_threads-1) {
+            counter = 0;
+            sem_post(&count_sem);
+
             for (auto v = 0; v < glob_N; v++) {
                 if (stash_excess[v] != 0) {
                     excess[v] += stash_excess[v];
@@ -121,13 +125,13 @@ void *Hello(void* rank) {
                 }
             }
 
-            counter = 0;
-            pthread_cond_broadcast(&unlock_barrier_signal);
+            for (int j=0 ; j < glob_num_threads-1 ; j++)
+                sem_post(&barrier_sem);
         } else {
-            while (pthread_cond_wait(&unlock_barrier_signal, &barrier_mutex) != 0);
+            counter++;
+            sem_post(&count_sem);
+            sem_wait(&barrier_sem);
         }
-
-        pthread_mutex_unlock(&barrier_mutex);
     }
 }
 
@@ -136,6 +140,9 @@ int push_relabel(int num_threads, int N, int src, int sink, int *cap, int *flow)
     pthread_t* thread_handles;
 
     initialize_globs(num_threads, N, src, sink, cap, flow);
+
+    sem_init(&count_sem, 0, 1);
+    sem_init(&barrier_sem, 0, 0);
 
     dist = (int *) calloc(N, sizeof(int));
     stash_dist = (int *) calloc(N, sizeof(int));
