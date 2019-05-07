@@ -26,13 +26,11 @@ void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
 }
 
 // Device code
-__global__ void foo_kernel(int* A, int* B, int* C)
-{
-    int i = blockDim.x * blockIdx.x + threadIdx.x;
-    C[i] = A[i] + B[i];
+__device__ int idx(int x, int y, int n) {
+    return x * n + y;
 }
-/*
-__global__ void push(int *active_nodes, int *active_node_size, int N, int *cap, int *flow, int *dist, unsigned long long *excess, int *stash_send){
+
+__global__ void push(int *active_nodes, int active_node_size, int N, int *cap, int *flow, int *dist, int64_t *excess, int *stash_send){
     int blockId = blockIdx.x;
     int threadId = threadIdx.x;
     int numBlock = gridDim.x;
@@ -40,29 +38,29 @@ __global__ void push(int *active_nodes, int *active_node_size, int N, int *cap, 
     int v, u;
     extern __shared__ unsigned long long residual_cap[];
 
-    for (int i = blockId; i < active_node_size[0]; i+=numBlock){
+    for (int i = blockId; i < active_node_size; i+=numBlock){
         u = active_nodes[i];
 
         for (v = threadId; v < N; v+=numThread){
             residual_cap[v] = cap[idx(u, v, N)] - flow[idx(u, v, N)];
         }
-        __syncthreads();
+        //__syncthreads();
 
         if (threadId == 0){
             v = 0;
 
             while(excess[u]>0 && v < N){
                 if (residual_cap[v] > 0 && dist[u] > dist[v]){
-                    stash_send[idx(u, v, N)] = min(excess[u], residual_cap[v]);
+                    stash_send[idx(u, v, N)] = min((unsigned long long)excess[u], residual_cap[v]);
                     excess[u] -= stash_send[idx(u, v, N)];
                 }
                 v++;
             }
         }
-        __syncthreads();
+        //__syncthreads();
     }
 }
- */
+
 
 int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int sink, int *cap, int *flow) {
     size_t size_in_int = N * sizeof(int);
@@ -80,13 +78,16 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
 
     // Allocate Vectors in device memory (GPU)
     int64_t *d_excess, *d_stash_excess;
-    int *d_dist, *d_stash_dist, *d_stash_send;
+    int *d_dist, *d_stash_dist, *d_stash_send, *d_cap, *d_flow;
 
     cudaMalloc((void**) &d_dist, size_in_int);
     cudaMalloc((void**) &d_excess, size_n_int64_t);
     cudaMalloc((void**) &d_stash_dist, size_in_int);
     cudaMalloc((void**) &d_stash_send, size_in_int);
     cudaMalloc((void**) &d_stash_excess, size_n_int64_t);
+    cudaMalloc((void**) &d_cap, N * N * sizeof(int));
+    cudaMalloc((void**) &d_flow, N * N * sizeof(int));
+
 
     // Initialise input data
     // PreFlow.
@@ -98,20 +99,26 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
         }
     }
 
+    int* d_active_nodes = &h_active_nodes[0];
+
+    cudaMalloc((void**) &d_active_nodes, h_active_nodes.size() * sizeof(int));
+
     // Copy vectors from host memory to device memory
     cudaMemcpy(d_dist, h_dist, size_in_int, cudaMemcpyHostToDevice);
     cudaMemcpy(d_excess, h_excess, size_n_int64_t, cudaMemcpyHostToDevice);
     cudaMemcpy(d_stash_dist, h_stash_dist, size_in_int, cudaMemcpyHostToDevice);
     cudaMemcpy(d_stash_send, h_stash_send, size_in_int, cudaMemcpyHostToDevice);
     cudaMemcpy(d_stash_excess, h_stash_excess, size_n_int64_t, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_cap, cap, N * N * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_flow, flow, N * N *  sizeof(int), cudaMemcpyHostToDevice);
 
     // Four-Stage Pulses.
     while (!h_active_nodes.empty()) {
         // Stage 1: push.
         //foo_kernel<<<blocks_per_grid, threads_per_block>>>(d_dist, d_excess);
-        //push<<<blocks_per_grid, threads_per_block>>>(h_active_nodes, active_node_size, N, cap, flow, dist, excess, d_stash_send);
-
-
+        cudaMemcpy(d_active_nodes, h_active_nodes.data(), sizeof(int) * h_active_nodes.size(), cudaMemcpyHostToDevice);
+        push<<<blocks_per_grid, threads_per_block>>>(d_active_nodes, h_active_nodes.size(), N, d_cap, d_flow, d_dist, d_excess, d_stash_send);
+        /*
         for (auto u : h_active_nodes) {
             for (auto v = 0; v < N; v++) {
                 auto residual_cap = cap[utils::idx(u, v, N)] - flow[utils::idx(u, v, N)];
@@ -129,8 +136,14 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
                 }
             }
         }
+        */
 
-
+        // Copy result
+        //cudaMemcpy(h_active_nodes, d_active_nodes, size_in_int, cudaMemcpyDeviceToHost);
+        cudaMemcpy(cap, d_cap, size_in_int, cudaMemcpyDeviceToHost);
+        cudaMemcpy(flow, d_flow, size_in_int, cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_dist, d_dist, size_in_int, cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_excess, d_excess, size_in_int, cudaMemcpyDeviceToHost);
         cudaMemcpy(h_stash_send, d_stash_send, size_in_int, cudaMemcpyDeviceToHost);
 
         // Stage 2: relabel (update dist to stash_dist).
