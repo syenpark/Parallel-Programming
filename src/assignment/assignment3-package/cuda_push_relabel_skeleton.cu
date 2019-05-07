@@ -47,8 +47,13 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
     cudaMalloc((void**) &d_stash_send, size_in_int);
     cudaMalloc((void**) &d_stash_excess, size_n_int64_t);
 
+    // Initialise input data
     // PreFlow.
     pre_flow(h_dist, h_excess, cap, flow, N, src);
+
+    // Copy vectors from host memory to device memory
+    cudaMemcpy(d_dist, h_dist, size_in_int, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_excess, h_excess, size_n_int64_t, cudaMemcpyHostToDevice);
 
     vector<int> active_nodes;
     int *h_stash_send = (int *) calloc(N * N, sizeof(int));
@@ -64,8 +69,7 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
         // Stage 1: push.
         for (auto u : active_nodes) {
             for (auto v = 0; v < N; v++) {
-                auto residual_cap = cap[utils::idx(u, v, N)] -
-                                    flow[utils::idx(u, v, N)];
+                auto residual_cap = cap[utils::idx(u, v, N)] - flow[utils::idx(u, v, N)];
                 if (residual_cap > 0 && h_dist[u] > h_dist[v] && h_excess[u] > 0) {
                     h_stash_send[utils::idx(u, v, N)] = std::min<int64_t>(h_excess[u], residual_cap);
                     h_excess[u] -= h_stash_send[utils::idx(u, v, N)];

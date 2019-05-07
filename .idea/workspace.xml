@@ -26,8 +26,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="40" column="11" selection-start-line="40" selection-start-column="11" selection-end-line="40" selection-end-column="11" />
+            <state relative-caret-position="285">
+              <caret line="54" column="28" selection-start-line="54" selection-start-column="28" selection-end-line="54" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -44,8 +44,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/example/simple.cu">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="666">
-              <caret line="49" selection-start-line="49" selection-end-line="49" />
+            <state relative-caret-position="260">
+              <caret line="32" selection-start-line="32" selection-end-line="32" />
             </state>
           </provider>
         </entry>
@@ -60,8 +60,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton2.cu">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="541">
-              <caret line="122" column="7" selection-start-line="122" selection-start-column="7" selection-end-line="122" selection-end-column="7" />
+            <state relative-caret-position="469">
+              <caret line="124" column="108" selection-start-line="124" selection-start-column="99" selection-end-line="124" selection-end-column="108" />
             </state>
           </provider>
         </entry>
@@ -114,6 +114,7 @@
       <find>h_dist</find>
       <find>dist</find>
       <find>h_dist</find>
+      <find>active_no</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/src/example</dir>
@@ -285,7 +286,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45214000" />
+    <option name="totallyTimeSpent" value="45616000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-66" y="54" width="1220" height="859" extended-state="0" />
@@ -635,24 +636,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/example/simple.cu">
+    <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton2.cu">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="666">
-          <caret line="49" selection-start-line="49" selection-end-line="49" />
+        <state relative-caret-position="469">
+          <caret line="124" column="108" selection-start-line="124" selection-start-column="99" selection-end-line="124" selection-end-column="108" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton2.cu">
+    <entry file="file://$PROJECT_DIR$/src/example/simple.cu">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="541">
-          <caret line="122" column="7" selection-start-line="122" selection-start-column="7" selection-end-line="122" selection-end-column="7" />
+        <state relative-caret-position="260">
+          <caret line="32" selection-start-line="32" selection-end-line="32" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="40" column="11" selection-start-line="40" selection-start-column="11" selection-end-line="40" selection-end-column="11" />
+        <state relative-caret-position="285">
+          <caret line="54" column="28" selection-start-line="54" selection-start-column="28" selection-end-line="54" selection-end-column="28" />
         </state>
       </provider>
     </entry>
