@@ -1,7 +1,7 @@
 /**
- * Name:
+ * Name: Seoyoung Park
  * Student id:
- * ITSC email:
+ * ITSC email: sparkap@connect.ust.hk
  */
 
 #include <cstring>
@@ -22,6 +22,8 @@ using namespace std;
 int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int sink, int *cap, int *flow) {
     /*
      *  Please fill in your codes here.
+     *
+     *  push relabel shouldn't run on cpu
      */
     return 0;
 }
