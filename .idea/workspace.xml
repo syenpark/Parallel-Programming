@@ -62,8 +62,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton2.cu">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="134" column="28" lean-forward="true" selection-start-line="134" selection-start-column="28" selection-end-line="134" selection-end-column="28" />
+            <state relative-caret-position="219">
+              <caret line="140" column="71" selection-start-line="140" selection-start-column="71" selection-end-line="140" selection-end-column="71" />
             </state>
           </provider>
         </entry>
@@ -272,7 +272,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="52071000" />
+    <option name="totallyTimeSpent" value="52634000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-100" y="25" width="1415" height="859" extended-state="0" />
@@ -633,8 +633,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton2.cu">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="134" column="28" lean-forward="true" selection-start-line="134" selection-start-column="28" selection-end-line="134" selection-end-column="28" />
+        <state relative-caret-position="219">
+          <caret line="140" column="71" selection-start-line="140" selection-start-column="71" selection-end-line="140" selection-end-column="71" />
         </state>
       </provider>
     </entry>

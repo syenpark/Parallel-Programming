@@ -98,7 +98,7 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
     cudaMalloc(&d_dist, N * sizeof(int));
     cudaMalloc(&d_stash_dist, N * sizeof(int));
 
-    int64_t *excess = (int64_t *) calloc(N, sizeof(int64_t));
+    int64_t *h_excess = (int64_t *) calloc(N, sizeof(int64_t));
     int64_t *d_excess;
     cudaMalloc(&d_excess, N * sizeof(int64_t));
 
@@ -109,47 +109,56 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
     int *d_cap, *d_flow;
     cudaMalloc(&d_cap, N * N * sizeof(int));
     cudaMalloc(&d_flow, N * N * sizeof(int));
-    
+
+    cudaMemcpy(d_dist, h_dist, sizeof(int) * N * N, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_excess, h_excess, sizeof(int) * N * N, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_cap, cap, sizeof(int) * N * N, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_flow, flow, sizeof(int) * N * N, cudaMemcpyHostToDevice);
 
     pre_flow_kernel<<<blocks_per_grid, threads_per_block>>>(d_dist, d_excess, d_cap, d_flow, N, src);
 
-    vector<int> active_nodes;
-    int *active_nodes_d;
-    cudaMalloc(&active_nodes_d, N * sizeof(int));
+    cudaMemcpy(h_dist, d_dist, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_excess, d_excess, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
+    cudaMemcpy(cap, d_cap, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
+    cudaMemcpy(flow, d_flow, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
 
-    int *stash_send = (int *) calloc(N * N, sizeof(int));
+    vector<int> h_active_nodes;
+    int *d_active_nodes;
+    cudaMalloc(&d_active_nodes, N * sizeof(int));
+
+    int *h_stash_send = (int *) calloc(N * N, sizeof(int));
+
     for (auto u = 0; u < N; u++) {
         if (u != src && u != sink) {
-            active_nodes.emplace_back(u);
+            h_active_nodes.emplace_back(u);
         }
     }
     
     // Four-Stage Pulses.
-    while (!active_nodes.empty()) {
-        int count = active_nodes.size();
-        cudaMemcpy(active_nodes_d, active_nodes.data(), sizeof(int) * count, cudaMemcpyHostToDevice);
-        push_kernel<<<blocks_per_grid, threads_per_block>>>(d_dist, d_excess, d_cap, d_flow, N, src, active_nodes_d, count, d_stash_excess);
+    while (!h_active_nodes.empty()) {
+        int count = h_active_nodes.size();
+        cudaMemcpy(d_active_nodes, h_active_nodes.data(), sizeof(int) * count, cudaMemcpyHostToDevice);
+        push_kernel<<<blocks_per_grid, threads_per_block>>>(d_dist, d_excess, d_cap, d_flow, N, src, d_active_nodes, count, d_stash_excess);
         
 		cudaMemcpy(d_stash_dist, d_dist, sizeof(int) * N, cudaMemcpyDeviceToDevice);
-		relabel_kernel<<<blocks_per_grid, threads_per_block>>>(d_dist, d_excess, d_cap, d_flow, N, src, active_nodes_d, count, d_stash_dist);
+		relabel_kernel<<<blocks_per_grid, threads_per_block>>>(d_dist, d_excess, d_cap, d_flow, N, src, d_active_nodes, count, d_stash_dist);
 		swap(d_dist, d_stash_dist);
         
 		relabel_excess_kernel<<<blocks_per_grid, threads_per_block>>>(d_excess, d_stash_excess, N);
-		cudaMemcpy(excess, d_excess, sizeof(int64_t) * N, cudaMemcpyDeviceToHost);
+		cudaMemcpy(h_excess, d_excess, sizeof(int64_t) * N, cudaMemcpyDeviceToHost);
         cudaMemcpy(flow, d_flow, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
         
-		active_nodes.clear();
+		h_active_nodes.clear();
         for (auto u = 0; u < N; u++) {
-            if (excess[u] > 0 && u != src && u != sink) {
-                active_nodes.emplace_back(u);
+            if (h_excess[u] > 0 && u != src && u != sink) {
+                h_active_nodes.emplace_back(u);
             }
         }
     }
 
     free(h_dist);
-    free(excess);
-    free(stash_send);
+    free(h_excess);
+    free(h_stash_send);
     free(stash_excess);
 
     return 0;
