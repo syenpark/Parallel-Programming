@@ -27,8 +27,7 @@ __global__ void push(int *active_nodes, int *active_node_size, int N, int *cap, 
 		u = active_nodes[i];
 
 		for (v = threadId; v < N; v+=numThread){
-			residual_cap[v] = cap[idx(u, v, N)] -
-							flow[idx(u, v, N)];
+			residual_cap[v] = cap[idx(u, v, N)] - flow[idx(u, v, N)];
 		}
 		__syncthreads();
 		if (threadId == 0){
