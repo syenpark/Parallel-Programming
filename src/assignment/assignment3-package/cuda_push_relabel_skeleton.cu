@@ -70,14 +70,12 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
         for (auto u : active_nodes) {
             for (auto v = 0; v < N; v++) {
                 auto residual_cap = cap[utils::idx(u, v, N)] - flow[utils::idx(u, v, N)];
+
                 if (residual_cap > 0 && h_dist[u] > h_dist[v] && h_excess[u] > 0) {
                     h_stash_send[utils::idx(u, v, N)] = std::min<int64_t>(h_excess[u], residual_cap);
                     h_excess[u] -= h_stash_send[utils::idx(u, v, N)];
                 }
-            }
-        }
-        for (auto u : active_nodes) {
-            for (auto v = 0; v < N; v++) {
+
                 if (h_stash_send[utils::idx(u, v, N)] > 0) {
                     flow[utils::idx(u, v, N)] += h_stash_send[utils::idx(u, v, N)];
                     flow[utils::idx(v, u, N)] -= h_stash_send[utils::idx(u, v, N)];
