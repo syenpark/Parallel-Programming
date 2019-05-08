@@ -50,7 +50,7 @@ __global__ void push(int *dist, unsigned long long int *excess, int *cap, int *f
             }
         }
     }
-    __syncthreads();
+    //__syncthreads();
 }
 
 
@@ -73,7 +73,7 @@ __global__ void relabel(int N, int src, int *dist, unsigned long long int *exces
             }
         }
     }
-    __syncthreads();
+    //__syncthreads();
 }
 
 __global__ void apply_changes(int N, unsigned long long int *excess, unsigned long long int *stash_excess){
@@ -85,7 +85,7 @@ __global__ void apply_changes(int N, unsigned long long int *excess, unsigned lo
             stash_excess[v] = 0;
         }
     }
-    __syncthreads();
+    //__syncthreads();
 }
 
 int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int sink, int *cap, int *flow) {
