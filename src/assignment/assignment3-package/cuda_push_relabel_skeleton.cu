@@ -25,6 +25,14 @@ void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
     }
 }
 
+__global__ void foo_kernel(int N){
+    int tid = blockDim.x * blockIdx.x + threadIdx.x;
+    int num_thread = blockDim.x * gridDim.x;
+
+    for (int i = tid ; i < N ; i += num_thread)
+        ;
+}
+
 int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int sink, int *cap, int *flow) {
     vector<int> active_nodes;
     int *dist = (int *) calloc(N, sizeof(int));
@@ -53,10 +61,7 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
                     stash_send[utils::idx(u, v, N)] = std::min<int64_t>(excess[u], residual_cap);
                     excess[u] -= stash_send[utils::idx(u, v, N)];
                 }
-            }
-        }
-        for (auto u : active_nodes) {
-            for (auto v = 0; v < N; v++) {
+
                 if (stash_send[utils::idx(u, v, N)] > 0) {
                     flow[utils::idx(u, v, N)] += stash_send[utils::idx(u, v, N)];
                     flow[utils::idx(v, u, N)] -= stash_send[utils::idx(u, v, N)];
