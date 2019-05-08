@@ -3,7 +3,7 @@
  * Student id:
  * ITSC email:
  */
-
+// #define int int64_t
 #include <cstring>
 #include <cstdint>
 #include <cstdlib>
@@ -15,105 +15,137 @@
 
 using namespace std;
 
-void pre_flow(int *dist, int64_t *excess, int *cap, int *flow, int N, int src) {
-    dist[src] = N;
+__device__ int flatten(int x, int y, int n) {
+    return x * n + y;
+}
 
-    for (auto v = 0; v < N; v++) {
-        flow[utils::idx(src, v, N)] = cap[utils::idx(src, v, N)];
-        flow[utils::idx(v, src, N)] = -flow[utils::idx(src, v, N)];
-        excess[v] = flow[utils::idx(src, v, N)];
+__global__ void pre_flow(int N, int src, int *dist, unsigned long long int *excess, int *cap, int *flow) {
+    dist[src] = N;
+    int elementSkip = blockDim.x * gridDim.x;
+    int start = blockDim.x * blockIdx.x + threadIdx.x;
+    for (auto v = start; v < N; v += elementSkip) {
+        flow[flatten(src, v, N)] = cap[flatten(src, v, N)];
+        flow[flatten(v, src, N)] = -flow[flatten(src, v, N)];
+        excess[v] = flow[flatten(src, v, N)];
     }
 }
 
-__global__ void foo_kernel(int N){
-    int tid = blockDim.x * blockIdx.x + threadIdx.x;
-    int num_thread = blockDim.x * gridDim.x;
+__global__ void stage1(int *dist, unsigned long long int *excess, int *cap, int *flow, int N, int src, int *active_nodes, int count, unsigned long long int *stash_excess) {
+    int start = blockDim.x * blockIdx.x + threadIdx.x;
+    int elementSkip = blockDim.x * gridDim.x;
 
-    for (int i = tid ; i < N ; i += num_thread)
-        ;
+    for (int i = start; i < count; i += elementSkip) {
+        int u = active_nodes[i];
+
+        for (auto v = 0; v < N; v++) {
+            long long int residual_cap = cap[flatten(u, v, N)] - flow[flatten(u, v, N)];
+
+            if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
+                unsigned long long int tmp = min(excess[u], residual_cap);
+                excess[u] -= tmp;
+                atomicAdd(flow + flatten(u, v, N), tmp);
+                atomicSub(flow + flatten(v, u, N), tmp);
+                atomicAdd(stash_excess + v, tmp);
+            }
+        }
+    }
+    __syncthreads();
+}
+
+
+__global__ void stage2(int N, int src, int *dist, unsigned long long int *excess, int *cap, int *flow, int *active_nodes, int count, int *stash_dist) {
+    int start = blockDim.x * blockIdx.x + threadIdx.x;
+    int elementSkip = blockDim.x * gridDim.x;
+
+    for (int i = start; i < count; i += elementSkip) {
+        int u = active_nodes[i];
+
+        if (excess[u] > 0) {
+            int min_dist = INT32_MAX;
+
+            for (auto v = 0; v < N; v++) {
+                auto residual_cap = cap[flatten(u, v, N)] - flow[flatten(u, v, N)];
+                if (residual_cap > 0) {
+                    min_dist = atomicMin(dist + v, min_dist);
+                    stash_dist[u] = min_dist + 1;
+                }
+            }
+        }
+    }
+    __syncthreads();
+}
+
+__global__ void stage4(int N, unsigned long long int *excess, unsigned long long int *stash_excess){
+    int start = blockDim.x * blockIdx.x + threadIdx.x;
+    int elementSkip = blockDim.x * gridDim.x;
+    for (int v = start; v < N; v += elementSkip) {
+        if (stash_excess[v] != 0) {
+            excess[v] += stash_excess[v];
+            stash_excess[v] = 0;
+        }
+    }
+    __syncthreads();
 }
 
 int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int sink, int *cap, int *flow) {
-    vector<int> active_nodes;
     int *dist = (int *) calloc(N, sizeof(int));
     int *stash_dist = (int *) calloc(N, sizeof(int));
-    int *stash_send = (int *) calloc(N * N, sizeof(int));
-    auto *excess = (int64_t *) calloc(N, sizeof(int64_t));
-    auto *stash_excess = (int64_t *) calloc(N, sizeof(int64_t));
+    unsigned long long int *excess = (unsigned long long int *) calloc(N, sizeof(unsigned long long));
+    unsigned long long int *stash_excess = (unsigned long long int *) calloc(N, sizeof(unsigned long long));
 
-    // PreFlow.
-    pre_flow(dist, excess, cap, flow, N, src);
+    int *dist_d, *stash_dist_d;
+    cudaMalloc(&dist_d, N * sizeof(int));
+    cudaMalloc(&stash_dist_d, N * sizeof(int));
 
+    unsigned long long int *excess_d, *stash_excess_d;
+    cudaMalloc(&excess_d, N * sizeof(unsigned long long));
+    cudaMalloc(&stash_excess_d, N * sizeof(unsigned long long));
+
+    int *cap_d, *flow_d;
+    cudaMalloc(&cap_d, N * N * sizeof(int));
+    cudaMalloc(&flow_d, N * N * sizeof(int));
+
+    cudaMemcpy(cap_d, cap, sizeof(int) * N * N, cudaMemcpyHostToDevice);
+    pre_flow<<<blocks_per_grid, threads_per_block>>>(N, src, dist_d, excess_d, cap_d, flow_d);
+
+    vector<int> active_nodes;
+    int *active_nodes_d;
+    cudaMalloc(&active_nodes_d, N * sizeof(int));
+
+    unsigned long long int *stash_send = (unsigned long long int *) calloc(N * N, sizeof(unsigned long long));
     for (auto u = 0; u < N; u++) {
         if (u != src && u != sink) {
             active_nodes.emplace_back(u);
         }
     }
 
-    // Four-Stage Pulses.
     while (!active_nodes.empty()) {
-        // Stage 1: push.
-        for (auto u : active_nodes) {
-            for (auto v = 0; v < N; v++) {
-                auto residual_cap = cap[utils::idx(u, v, N)] -
-                                    flow[utils::idx(u, v, N)];
-                if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
-                    stash_send[utils::idx(u, v, N)] = std::min<int64_t>(excess[u], residual_cap);
-                    excess[u] -= stash_send[utils::idx(u, v, N)];
-                }
-            }
-        }
-        
-        for (auto u : active_nodes) {
-            for (auto v = 0; v < N; v++) {
-                if (stash_send[utils::idx(u, v, N)] > 0) {
-                    flow[utils::idx(u, v, N)] += stash_send[utils::idx(u, v, N)];
-                    flow[utils::idx(v, u, N)] -= stash_send[utils::idx(u, v, N)];
-                    stash_excess[v] += stash_send[utils::idx(u, v, N)];
-                    stash_send[utils::idx(u, v, N)] = 0;
-                }
-            }
-        }
+        int count = active_nodes.size();
+        cudaMemcpy(active_nodes_d, active_nodes.data(), sizeof(int) * count, cudaMemcpyHostToDevice);
+        stage1<<<blocks_per_grid, threads_per_block>>>(dist_d, excess_d, cap_d, flow_d, N, src, active_nodes_d, count, stash_excess_d);
 
-        // Stage 2: relabel (update dist to stash_dist).
-        memcpy(stash_dist, dist, N * sizeof(int));
+        cudaMemcpy(stash_dist_d, dist_d, N * sizeof(int), cudaMemcpyDeviceToDevice);
+        stage2<<<blocks_per_grid, threads_per_block>>>(N, src, dist_d, excess_d, cap_d, flow_d, active_nodes_d, count, stash_dist_d);
+        swap(dist_d, stash_dist_d);
 
-        for (auto u : active_nodes) {
-            if (excess[u] > 0) {
-                int min_dist = INT32_MAX;
+        stage4<<<blocks_per_grid, threads_per_block>>>(N, excess_d, stash_excess_d);
+        cudaMemcpy(excess, excess_d, sizeof(unsigned long long) * N, cudaMemcpyDeviceToHost);
+        cudaMemcpy(flow, flow_d, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
 
-                for (auto v = 0; v < N; v++) {
-                    auto residual_cap = cap[utils::idx(u, v, N)] - flow[utils::idx(u, v, N)];
-
-                    if (residual_cap > 0) {
-                        min_dist = min(min_dist, dist[v]);
-                        stash_dist[u] = min_dist + 1;
-                    }
-                }
-            }
-        }
-
-        // Stage 3: update dist.
-        swap(dist, stash_dist);
-
-        // Stage 4: apply excess-flow changes for destination vertices.
-        for (auto v = 0; v < N; v++) {
-
-            if (stash_excess[v] != 0) {
-                excess[v] += stash_excess[v];
-                stash_excess[v] = 0;
-            }
-        }
-
-        // Construct active nodes.
         active_nodes.clear();
-        
         for (auto u = 0; u < N; u++) {
             if (excess[u] > 0 && u != src && u != sink) {
                 active_nodes.emplace_back(u);
             }
         }
     }
+    // cudaFree(dist_d);
+    // cudaFree(stash_dist_d);
+    // cudaFree(excess_d);
+    // cudaFree(stash_excess_d);
+    // cudaFree(cap_d);
+    // cudaFree(flow_d);
+    // cudaFree(active_nodes_d);
 
     free(dist);
     free(stash_dist);
