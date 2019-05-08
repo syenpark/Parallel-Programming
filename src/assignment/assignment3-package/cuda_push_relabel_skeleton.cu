@@ -23,6 +23,7 @@ __global__ void pre_flow(int N, int src, int *dist, unsigned long long int *exce
     dist[src] = N;
     int elementSkip = blockDim.x * gridDim.x;
     int start = blockDim.x * blockIdx.x + threadIdx.x;
+
     for (auto v = start; v < N; v += elementSkip) {
         flow[flatten(src, v, N)] = cap[flatten(src, v, N)];
         flow[flatten(v, src, N)] = -flow[flatten(src, v, N)];
@@ -30,7 +31,7 @@ __global__ void pre_flow(int N, int src, int *dist, unsigned long long int *exce
     }
 }
 
-__global__ void stage1(int *dist, unsigned long long int *excess, int *cap, int *flow, int N, int src, int *active_nodes, int count, unsigned long long int *stash_excess) {
+__global__ void push(int *dist, unsigned long long int *excess, int *cap, int *flow, int N, int src, int *active_nodes, int count, unsigned long long int *stash_excess) {
     int start = blockDim.x * blockIdx.x + threadIdx.x;
     int elementSkip = blockDim.x * gridDim.x;
 
@@ -53,7 +54,7 @@ __global__ void stage1(int *dist, unsigned long long int *excess, int *cap, int 
 }
 
 
-__global__ void stage2(int N, int src, int *dist, unsigned long long int *excess, int *cap, int *flow, int *active_nodes, int count, int *stash_dist) {
+__global__ void relabel(int N, int src, int *dist, unsigned long long int *excess, int *cap, int *flow, int *active_nodes, int count, int *stash_dist) {
     int start = blockDim.x * blockIdx.x + threadIdx.x;
     int elementSkip = blockDim.x * gridDim.x;
 
@@ -75,7 +76,7 @@ __global__ void stage2(int N, int src, int *dist, unsigned long long int *excess
     __syncthreads();
 }
 
-__global__ void stage4(int N, unsigned long long int *excess, unsigned long long int *stash_excess){
+__global__ void apply_changes(int N, unsigned long long int *excess, unsigned long long int *stash_excess){
     int start = blockDim.x * blockIdx.x + threadIdx.x;
     int elementSkip = blockDim.x * gridDim.x;
     for (int v = start; v < N; v += elementSkip) {
@@ -121,14 +122,18 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
 
     while (!active_nodes.empty()) {
         int count = active_nodes.size();
+
         cudaMemcpy(active_nodes_d, active_nodes.data(), sizeof(int) * count, cudaMemcpyHostToDevice);
-        stage1<<<blocks_per_grid, threads_per_block>>>(dist_d, excess_d, cap_d, flow_d, N, src, active_nodes_d, count, stash_excess_d);
+        push<<<blocks_per_grid, threads_per_block>>>(dist_d, excess_d, cap_d, flow_d, N, src, active_nodes_d, count, stash_excess_d);
 
         cudaMemcpy(stash_dist_d, dist_d, N * sizeof(int), cudaMemcpyDeviceToDevice);
-        stage2<<<blocks_per_grid, threads_per_block>>>(N, src, dist_d, excess_d, cap_d, flow_d, active_nodes_d, count, stash_dist_d);
+        relabel<<<blocks_per_grid, threads_per_block>>>(N, src, dist_d, excess_d, cap_d, flow_d, active_nodes_d, count, stash_dist_d);
+
+        // Stage 3. Update
         swap(dist_d, stash_dist_d);
 
-        stage4<<<blocks_per_grid, threads_per_block>>>(N, excess_d, stash_excess_d);
+        // Stage 4: apply excess-flow changes for destination vertices.
+        apply_changes<<<blocks_per_grid, threads_per_block>>>(N, excess_d, stash_excess_d);
         cudaMemcpy(excess, excess_d, sizeof(unsigned long long) * N, cudaMemcpyDeviceToHost);
         cudaMemcpy(flow, flow_d, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
 
