@@ -1,7 +1,7 @@
 /**
- * Name:
+ * Name: Seoyoung Park
  * Student id:
- * ITSC email:
+ * ITSC email: sparkap@connect.ust.hk
  */
 // #define int int64_t
 #include <cstring>
@@ -15,42 +15,41 @@
 
 using namespace std;
 
-__device__ int flatten(int x, int y, int n) {
+__device__ int idx(int x, int y, int n) {
     return x * n + y;
 }
 
-__global__ void pre_flow(int N, int src, int *dist, unsigned long long int *excess, int *cap, int *flow) {
+__global__ void pre_flow(int *dist, unsigned long long int *excess, int *cap, int *flow, int N, int src) {
     dist[src] = N;
-    int elementSkip = blockDim.x * gridDim.x;
-    int start = blockDim.x * blockIdx.x + threadIdx.x;
+    int num_threads = blockDim.x * gridDim.x;
+    int tid = blockDim.x * blockIdx.x + threadIdx.x;
 
-    for (auto v = start; v < N; v += elementSkip) {
-        flow[flatten(src, v, N)] = cap[flatten(src, v, N)];
-        flow[flatten(v, src, N)] = -flow[flatten(src, v, N)];
-        excess[v] = flow[flatten(src, v, N)];
+    for (auto v = tid; v < N; v += num_threads) {
+        flow[idx(src, v, N)] = cap[idx(src, v, N)];
+        flow[idx(v, src, N)] = -flow[idx(src, v, N)];
+        excess[v] = flow[idx(src, v, N)];
     }
 }
 
 __global__ void push(int *dist, unsigned long long int *excess, int *cap, int *flow, int N, int src, int *active_nodes, int count, unsigned long long int *stash_excess) {
-    int start = blockDim.x * blockIdx.x + threadIdx.x;
-    int elementSkip = blockDim.x * gridDim.x;
+    int num_threads = blockDim.x * gridDim.x;
+    int tid = blockDim.x * blockIdx.x + threadIdx.x;
 
-    for (int i = start; i < count; i += elementSkip) {
+    for (int i = tid; i < count; i += num_threads) {
         int u = active_nodes[i];
 
         for (auto v = 0; v < N; v++) {
-            long long int residual_cap = cap[flatten(u, v, N)] - flow[flatten(u, v, N)];
+            long long int residual_cap = cap[idx(u, v, N)] - flow[idx(u, v, N)];
 
             if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
                 unsigned long long int tmp = min(excess[u], residual_cap);
                 excess[u] -= tmp;
-                atomicAdd(flow + flatten(u, v, N), tmp);
-                atomicSub(flow + flatten(v, u, N), tmp);
+                atomicAdd(flow + idx(u, v, N), tmp);
+                atomicSub(flow + idx(v, u, N), tmp);
                 atomicAdd(stash_excess + v, tmp);
             }
         }
     }
-    //__syncthreads();
 }
 
 
@@ -65,7 +64,7 @@ __global__ void relabel(int N, int src, int *dist, unsigned long long int *exces
             int min_dist = INT32_MAX;
 
             for (auto v = 0; v < N; v++) {
-                auto residual_cap = cap[flatten(u, v, N)] - flow[flatten(u, v, N)];
+                auto residual_cap = cap[idx(u, v, N)] - flow[idx(u, v, N)];
                 if (residual_cap > 0) {
                     min_dist = atomicMin(dist + v, min_dist);
                     stash_dist[u] = min_dist + 1;
@@ -73,7 +72,6 @@ __global__ void relabel(int N, int src, int *dist, unsigned long long int *exces
             }
         }
     }
-    //__syncthreads();
 }
 
 __global__ void apply_changes(int N, unsigned long long int *excess, unsigned long long int *stash_excess){
@@ -85,7 +83,6 @@ __global__ void apply_changes(int N, unsigned long long int *excess, unsigned lo
             stash_excess[v] = 0;
         }
     }
-    //__syncthreads();
 }
 
 int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int sink, int *cap, int *flow) {
@@ -107,7 +104,7 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
     cudaMalloc(&flow_d, N * N * sizeof(int));
 
     cudaMemcpy(cap_d, cap, sizeof(int) * N * N, cudaMemcpyHostToDevice);
-    pre_flow<<<blocks_per_grid, threads_per_block>>>(N, src, dist_d, excess_d, cap_d, flow_d);
+    pre_flow<<<blocks_per_grid, threads_per_block>>>(dist_d, excess_d, cap_d, flow_d, N, src);
 
     vector<int> active_nodes;
     int *active_nodes_d;
@@ -144,6 +141,13 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
             }
         }
     }
+
+    free(dist);
+    free(stash_dist);
+    free(excess);
+    free(stash_excess);
+    free(stash_send);
+
     // cudaFree(dist_d);
     // cudaFree(stash_dist_d);
     // cudaFree(excess_d);
@@ -151,12 +155,6 @@ int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int
     // cudaFree(cap_d);
     // cudaFree(flow_d);
     // cudaFree(active_nodes_d);
-
-    free(dist);
-    free(stash_dist);
-    free(excess);
-    free(stash_excess);
-    free(stash_send);
 
     return 0;
 }
