@@ -9,7 +9,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a193fa77-9e09-417d-94f4-843721af4272" name="Default Changelist" comment="" />
+    <list default="true" id="a193fa77-9e09-417d-94f4-843721af4272" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu" beforeDir="false" afterPath="$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,47 +23,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
-              <caret line="35" selection-start-line="35" selection-end-line="35" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/solution_pthread_push_relabel_skeleton.cpp">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/example/ch4/pth_msg_sem.c">
+        <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1530">
-              <caret line="102" column="12" selection-start-line="102" selection-start-column="12" selection-end-line="102" selection-end-column="12" />
+            <state relative-caret-position="1500">
+              <caret line="100" column="8" selection-start-line="100" selection-start-column="8" selection-end-line="100" selection-end-column="8" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/example/ch4/pth_sem_bar.c">
+        <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/serial/serial_push_relabel.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="810">
-              <caret line="54" column="3" selection-start-line="54" selection-start-column="3" selection-end-line="54" selection-end-column="3" />
-              <folding>
-                <element signature="e#2370#2397#0" expanded="true" />
-                <element signature="e#2805#2915#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/assignment/assignment1-package/mpi_push_relabel_skeleton.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1485">
-              <caret line="99" column="24" selection-start-line="99" selection-start-column="24" selection-end-line="99" selection-end-column="24" />
+            <state relative-caret-position="569">
+              <caret line="102" column="13" selection-start-line="102" selection-start-column="13" selection-end-line="102" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -125,14 +100,15 @@
         <option value="$PROJECT_DIR$/src/example/ch4/pth_msg_sem_mac.c" />
         <option value="$USER_HOME$/Downloads/pthread_push_relabel_skeleton.cpp" />
         <option value="$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp" />
+        <option value="$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu" />
       </list>
     </option>
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
-    <option name="x" value="3" />
+    <option name="x" value="-96" />
     <option name="y" value="23" />
-    <option name="width" value="1220" />
+    <option name="width" value="1415" />
     <option name="height" value="859" />
   </component>
   <component name="ProjectView">
@@ -140,7 +116,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -164,37 +139,14 @@
               <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="assignment" type="462c0819:PsiDirectoryNode" />
-              <item name="assignment1-package" type="462c0819:PsiDirectoryNode" />
+              <item name="assignment3-package" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
               <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="assignment" type="462c0819:PsiDirectoryNode" />
-              <item name="assignment1-package" type="462c0819:PsiDirectoryNode" />
-              <item name="serial" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="assignment" type="462c0819:PsiDirectoryNode" />
-              <item name="assignment2-package" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="assignment" type="462c0819:PsiDirectoryNode" />
-              <item name="assignment2-package" type="462c0819:PsiDirectoryNode" />
-              <item name="datasets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="assignment" type="462c0819:PsiDirectoryNode" />
-              <item name="assignment2-package" type="462c0819:PsiDirectoryNode" />
+              <item name="assignment3-package" type="462c0819:PsiDirectoryNode" />
               <item name="serial" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -202,25 +154,12 @@
               <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="example" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-              <item name="ch4" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-              <item name="mpi_example_code" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -273,12 +212,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="35550000" />
+    <option name="totallyTimeSpent" value="36083000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="3" y="23" width="1220" height="859" extended-state="0" />
+    <frame x="-96" y="23" width="1415" height="859" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3319185" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.31391114" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -529,11 +469,7 @@
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/Downloads/pthread_push_relabel_skeleton.cpp" />
-    <entry file="file://$USER_HOME$/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/e34b4f3f27827d56bfc9816fdbfc6335/Message/MessageTemp/9c2685a6152990e9595d11c378607472/File/pthread_push_relabel_skeleton_backup.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-382" />
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/e34b4f3f27827d56bfc9816fdbfc6335/Message/MessageTemp/9c2685a6152990e9595d11c378607472/File/pthread_push_relabel_skeleton_backup.cpp" />
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="378">
@@ -568,6 +504,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/solution_pthread_push_relabel_skeleton.cpp">
       <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/serial/serial_push_relabel.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="569">
+          <caret line="102" column="13" selection-start-line="102" selection-start-column="13" selection-end-line="102" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1500">
+          <caret line="100" column="8" selection-start-line="100" selection-start-column="8" selection-end-line="100" selection-end-column="8" />
+        </state>
+      </provider>
     </entry>
   </component>
 </project>
