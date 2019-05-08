@@ -23,48 +23,92 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="33">
               <caret line="24" column="5" lean-forward="true" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+=======
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="14" lean-forward="true" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="14" />
+>>>>>>> CUDA-Re
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2025">
               <caret line="135" column="1" selection-start-line="135" selection-start-column="1" selection-end-line="135" selection-end-column="1" />
+=======
+        <entry file="file://$USER_HOME$/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/e34b4f3f27827d56bfc9816fdbfc6335/Message/MessageTemp/9c2685a6152990e9595d11c378607472/File/cuda_push_relabel_skeleton3.cu">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="274">
+              <caret line="22" column="13" lean-forward="true" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+>>>>>>> CUDA-Re
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/serial/serial_push_relabel.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="309">
               <caret line="61" selection-start-line="61" selection-end-line="61" />
+=======
+        <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="825">
+              <caret line="55" column="32" selection-start-line="55" selection-start-column="32" selection-end-line="55" selection-end-column="32" />
+>>>>>>> CUDA-Re
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/src/example/matrix.cu">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="394">
               <caret line="100" column="11" selection-start-line="100" selection-start-column="11" selection-end-line="100" selection-end-column="11" />
+=======
+        <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/serial/serial_push_relabel.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="26" selection-start-line="26" selection-end-line="26" />
+>>>>>>> CUDA-Re
             </state>
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton2.cu">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="219">
               <caret line="140" column="71" selection-start-line="140" selection-start-column="71" selection-end-line="140" selection-end-column="71" />
+=======
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/e34b4f3f27827d56bfc9816fdbfc6335/Message/MessageTemp/9c2685a6152990e9595d11c378607472/File/cuda_push_relabel_skeleton2.cu">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="557">
+              <caret line="73" column="35" lean-forward="true" selection-start-line="73" selection-start-column="35" selection-end-line="73" selection-end-column="35" />
+>>>>>>> CUDA-Re
             </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/example/vectorAdd.cu">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-532" />
           </provider>
         </entry>
       </file>
@@ -79,7 +123,6 @@
       <find>semaphores</find>
       <find>push_relab</find>
       <find>send</find>
-      <find>stash_send</find>
       <find>p</find>
       <find>cap</find>
       <find>unlock</find>
@@ -90,6 +133,7 @@
       <find>ok_to_pro</find>
       <find>counter</find>
       <find>count_s</find>
+<<<<<<< HEAD
       <find>h_dist</find>
       <find>dist</find>
       <find>flow_d</find>
@@ -101,6 +145,14 @@
       <find>active_no</find>
       <find>active_nodes</find>
       <find>DeviceToHost</find>
+=======
+      <find>stash_dist</find>
+      <find>flatten</find>
+      <find>pre_</find>
+      <find>start</find>
+      <find>stash_send</find>
+      <find>cap_d</find>
+>>>>>>> CUDA-Re
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/src/example</dir>
@@ -137,20 +189,29 @@
         <option value="$PROJECT_DIR$/src/example/ch4/pth_msg_sem_mac.c" />
         <option value="$USER_HOME$/Downloads/pthread_push_relabel_skeleton.cpp" />
         <option value="$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp" />
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/src/example/deviceVariable.cu" />
         <option value="$PROJECT_DIR$/src/example/simple.c" />
         <option value="$PROJECT_DIR$/src/example/simple.cu" />
         <option value="$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton3.cu" />
         <option value="$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu" />
         <option value="$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton2.cu" />
+=======
+        <option value="$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu" />
+>>>>>>> CUDA-Re
       </list>
     </option>
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
+<<<<<<< HEAD
     <option name="x" value="-100" />
     <option name="y" value="25" />
     <option name="width" value="1415" />
+=======
+    <option name="y" value="41" />
+    <option name="width" value="1585" />
+>>>>>>> CUDA-Re
     <option name="height" value="859" />
   </component>
   <component name="ProjectView">
@@ -158,7 +219,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -182,7 +242,18 @@
               <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="assignment" type="462c0819:PsiDirectoryNode" />
+<<<<<<< HEAD
               <item name="assignment2-package" type="462c0819:PsiDirectoryNode" />
+=======
+              <item name="assignment1-package" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="assignment" type="462c0819:PsiDirectoryNode" />
+              <item name="assignment1-package" type="462c0819:PsiDirectoryNode" />
+              <item name="datasets" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
@@ -190,6 +261,18 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="assignment" type="462c0819:PsiDirectoryNode" />
               <item name="assignment3-package" type="462c0819:PsiDirectoryNode" />
+>>>>>>> CUDA-Re
+            </path>
+            <path>
+              <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MSBD5009" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="assignment" type="462c0819:PsiDirectoryNode" />
+              <item name="assignment3-package" type="462c0819:PsiDirectoryNode" />
+<<<<<<< HEAD
+=======
+              <item name="datasets" type="462c0819:PsiDirectoryNode" />
+>>>>>>> CUDA-Re
             </path>
             <path>
               <item name="MSBD5009" type="b2602c69:ProjectViewProjectNode" />
@@ -209,6 +292,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -219,7 +303,11 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
+<<<<<<< HEAD
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/example" />
+=======
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/assignment/assignment3-package/datasets" />
+>>>>>>> CUDA-Re
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="web.server" />
@@ -272,6 +360,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="52634000" />
   </component>
   <component name="ToolWindowManager">
@@ -279,16 +368,25 @@
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30954114" />
+=======
+    <option name="totallyTimeSpent" value="42129000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="41" width="1585" height="859" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.279326" />
+>>>>>>> CUDA-Re
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" visible="true" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="File Transfer" order="7" visible="true" weight="0.32985657" />
+      <window_info anchor="bottom" id="File Transfer" order="7" weight="0.32985657" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.32985657" />
@@ -558,6 +656,7 @@
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/solution_pthread_push_relabel_skeleton.cpp">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-190" />
@@ -635,13 +734,61 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="219">
           <caret line="140" column="71" selection-start-line="140" selection-start-column="71" selection-end-line="140" selection-end-column="71" />
+=======
+    <entry file="file://$PROJECT_DIR$/src/example/deviceVariable.cu">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/example/demo2.cu">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2475">
+          <caret line="165" column="4" lean-forward="true" selection-start-line="165" selection-start-column="4" selection-end-line="165" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/datasets/input3.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/datasets/input0.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assignment/assignment2-package/pthread_push_relabel_skeleton.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="825">
+          <caret line="55" column="32" selection-start-line="55" selection-start-column="32" selection-end-line="55" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/e34b4f3f27827d56bfc9816fdbfc6335/Message/MessageTemp/9c2685a6152990e9595d11c378607472/File/cuda_push_relabel_skeleton3.cu">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="22" column="13" lean-forward="true" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/serial/serial_push_relabel.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="26" selection-start-line="26" selection-end-line="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/e34b4f3f27827d56bfc9816fdbfc6335/Message/MessageTemp/9c2685a6152990e9595d11c378607472/File/cuda_push_relabel_skeleton2.cu">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="557">
+          <caret line="73" column="35" lean-forward="true" selection-start-line="73" selection-start-column="35" selection-end-line="73" selection-end-column="35" />
+>>>>>>> CUDA-Re
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/assignment/assignment3-package/cuda_push_relabel_skeleton.cu">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="33">
           <caret line="24" column="5" lean-forward="true" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+=======
+        <state relative-caret-position="30">
+          <caret line="2" column="14" lean-forward="true" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="14" />
+>>>>>>> CUDA-Re
         </state>
       </provider>
     </entry>
