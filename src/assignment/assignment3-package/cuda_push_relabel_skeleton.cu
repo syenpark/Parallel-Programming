@@ -1,8 +1,9 @@
 /**
- * Name: Seoyoung Park
+ * Name:
  * Student id:
- * ITSC email: sparkap@connect.ust.hk
+ * ITSC email:
  */
+
 #include <cstring>
 #include <cstdint>
 #include <cstdlib>
@@ -14,70 +15,149 @@
 
 using namespace std;
 
-__device__ int idx(int x, int y, int n) {
-    return x * n + y;
-}
-
 __global__ void pre_flow(int *dist, unsigned long long int *excess, int *cap, int *flow, int N, int src) {
-    dist[src] = N;
-    int num_threads = blockDim.x * gridDim.x;
-    int tid = blockDim.x * blockIdx.x + threadIdx.x;
+    int global_tid = blockDim.x * blockIdx.x + threadIdx.x;
+    int element_skip = blockDim.x * gridDim.x;
 
-    for (auto v = tid ; v < N ; v += num_threads) {
-        flow[idx(src, v, N)] = cap[idx(src, v, N)];
-        flow[idx(v, src, N)] = -flow[idx(src, v, N)];
-        excess[v] = flow[idx(src, v, N)];
+    if (global_tid == 0 && blockIdx.x == 0) {
+        dist[src] = N;
+    }
+
+    for (int v = global_tid; v < N; v += element_skip) {
+        flow[utils::dev_idx(src, v, N)] = cap[utils::dev_idx(src, v, N)];
+        flow[utils::dev_idx(v, src, N)] = -flow[utils::dev_idx(src, v, N)];
+        excess[v] = flow[utils::dev_idx(src, v, N)];
     }
 }
 
-__global__ void push(int count, int *active_nodes, int *dist, unsigned long long int *excess, unsigned long long int *stash_excess, int N, int src, int *cap, int *flow) {
-    int num_threads = blockDim.x * gridDim.x;
-    int tid = blockDim.x * blockIdx.x + threadIdx.x;
 
-    for (int i = tid ; i < count ; i += num_threads) {
-        int u = active_nodes[i];
+/*
+ * NOTE: below there are two version of `push` function. Both are OK for us.
+ * The second one is slight faster than the first one
+ *
+ */
 
-        for (auto v = 0 ; v < N ; v++) {
-            long long int residual_cap = cap[idx(u, v, N)] - flow[idx(u, v, N)];
+__global__ void push(int* active_nodes, int active_nodes_size, int* dist, unsigned long long int *excess,
+                     int* stash_send, int *cap, int *flow, int N) {
 
-            if (residual_cap > 0 && dist[u] > dist[v] && excess[u] > 0) {
-                unsigned long long int temp = min(excess[u], residual_cap);
-                excess[u] -= temp;
-                atomicAdd(flow + idx(u, v, N), temp);
-                atomicSub(flow + idx(v, u, N), temp);
-                atomicAdd(stash_excess + v, temp);
+    for (int nodes_it = blockIdx.x; nodes_it < active_nodes_size; nodes_it += gridDim.x) {
+        auto u = active_nodes[nodes_it];
+        extern __shared__ int v_can_push_excess[];
+
+        __shared__ int v_can_push_count;
+
+        if (threadIdx.x == 0){
+            v_can_push_count = 0;
+        }
+        __syncthreads();
+
+        for (int v = threadIdx.x; v < N; v += blockDim.x) {
+            auto residual_cap = cap[utils::dev_idx(u, v, N)] - flow[utils::dev_idx(u, v, N)];
+            if (residual_cap > 0 && dist[u] > dist[v] && excess[u] != 0) {
+                int this_pos = atomicAdd(&v_can_push_count, 2);
+                v_can_push_excess[this_pos] = residual_cap;
+                v_can_push_excess[this_pos + 1] = v;
             }
         }
-    }
-}
+        __syncthreads();
 
-__global__ void relabel(int count, int *active_nodes, int *dist, unsigned long long int *excess, int *stash_dist, int N, int src,  int *cap, int *flow) {
-    int num_threads = blockDim.x * gridDim.x;
-    int tid = blockDim.x * blockIdx.x + threadIdx.x;
-
-    for (int i = tid ; i < count ; i += num_threads) {
-        int u = active_nodes[i];
-
-        if (excess[u] > 0) {
-            int min_dist = INT32_MAX;
-
-            for (auto v = 0 ; v < N ; v++) {
-                auto residual_cap = cap[idx(u, v, N)] - flow[idx(u, v, N)];
-
-                if (residual_cap > 0) {
-                    min_dist = atomicMin(dist + v, min_dist);
-                    stash_dist[u] = min_dist + 1;
+        if(threadIdx.x == 0){
+            for (int v = 0; v < v_can_push_count && excess[u] != 0; v +=2){
+                if(v_can_push_excess[v] > 0){
+                    auto send = v_can_push_excess[v] < excess[u] ? v_can_push_excess[v]:excess[u];
+                    auto new_excess = excess[u] - send;
+                    excess[u] = new_excess;
+                    stash_send[utils::dev_idx(u, v_can_push_excess[v+1], N)] = send;
                 }
             }
         }
+        __syncthreads();
     }
 }
 
-__global__ void apply_changes(int N, unsigned long long int *excess, unsigned long long int *stash_excess){
-    int num_threads = blockDim.x * gridDim.x;
-    int tid = blockDim.x * blockIdx.x + threadIdx.x;
+//__global__ void push(int* active_nodes, int active_nodes_size, int* dist, unsigned long long int *excess,
+//                     int* stash_send, int *cap, int *flow, int N) {
+//    for (int nodes_it = blockIdx.x; nodes_it < active_nodes_size; nodes_it += gridDim.x) {
+//        auto u = active_nodes[nodes_it];
 
-    for (int v = tid ; v < N ; v += num_threads) {
+//        for (int v = threadIdx.x; v < N; v += blockDim.x) {
+//            auto residual_cap = cap[utils::dev_idx(u, v, N)] - flow[utils::dev_idx(u, v, N)];
+
+//            if (residual_cap > 0 && dist[u] > dist[v] && excess[u] != 0) {
+//                unsigned long long int send;
+//                unsigned long long int old_excess;
+//                unsigned long long int new_excess;
+
+//                do {
+//                    old_excess = excess[u];
+//                    send = old_excess < residual_cap ? old_excess : residual_cap;
+//                    new_excess = old_excess - send;
+//
+//                    auto tmp = atomicCAS(excess + u, old_excess, new_excess);
+
+//                    if (tmp == old_excess) {
+//                        stash_send[utils::dev_idx(u, v, N)] = send;
+//                        break;
+//                    }
+
+//                } while (excess[u] != 0);
+//            }
+//        }
+//    }
+//}
+
+__global__ void apply_push_stash(int* active_nodes, int active_nodes_size, unsigned long long int *stash_excess,
+                                 int* stash_send, int *flow, int N) {
+
+    for (int nodes_it = blockIdx.x; nodes_it < active_nodes_size; nodes_it += gridDim.x) {
+        auto u = active_nodes[nodes_it];
+
+        for (int v = threadIdx.x; v < N; v += blockDim.x) {
+            if (stash_send[utils::dev_idx(u, v, N)] > 0) {
+                auto send = stash_send[utils::dev_idx(u, v, N)];
+                flow[utils::dev_idx(u, v, N)] += send;
+                flow[utils::dev_idx(v, u, N)] -= send;
+                atomicAdd(stash_excess + v, send);
+                stash_send[utils::dev_idx(u, v, N)] = 0;
+            }
+        }
+    }
+}
+
+__global__ void relabel(int* active_nodes, int active_nodes_size, unsigned long long int *excess, int* dist,
+                        int* dist_stash, int *cap, int *flow, int N) {
+
+    for (int nodes_it = blockIdx.x; nodes_it < active_nodes_size; nodes_it += gridDim.x) {
+        auto u = active_nodes[nodes_it];
+
+        if (excess[u] != 0) {
+            __shared__ int min_dist;
+
+            if (threadIdx.x == 0) {
+                min_dist = INT32_MAX;
+            }
+            __syncthreads();
+
+            for (int v = threadIdx.x; v < N; v += blockDim.x) {
+                auto residual_cap = cap[utils::dev_idx(u, v, N)] - flow[utils::dev_idx(u, v, N)];
+                if (residual_cap > 0) {
+                    atomicMin(&min_dist, dist[v]);
+                }
+            }
+            __syncthreads();
+
+            if(threadIdx.x == 0) {
+                dist_stash[u] = min_dist + 1;
+            }
+        }
+    }
+}
+
+__global__ void update_excess(unsigned long long int *excess, unsigned long long int *stash_excess, int N) {
+    int global_tid = blockDim.x * blockIdx.x + threadIdx.x;
+    int element_skip = blockDim.x * gridDim.x;
+
+    for (int v = global_tid; v < N; v += element_skip) {
         if (stash_excess[v] != 0) {
             excess[v] += stash_excess[v];
             stash_excess[v] = 0;
@@ -85,80 +165,107 @@ __global__ void apply_changes(int N, unsigned long long int *excess, unsigned lo
     }
 }
 
-int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int sink, int *h_cap, int *h_flow) {
-    vector<int> h_active_nodes;
-    int *h_dist = (int *) calloc(N, sizeof(int));
-    int *h_stash_dist = (int *) calloc(N, sizeof(int));
-    unsigned long long int *h_excess = (unsigned long long int *) calloc(N, sizeof(unsigned long long));
-    unsigned long long int *h_stash_excess = (unsigned long long int *) calloc(N, sizeof(unsigned long long));
+int push_relabel(int blocks_per_grid, int threads_per_block, int N, int src, int sink, int *cap, int *flow) {
+    dim3 blocks(blocks_per_grid);
+    dim3 threads(threads_per_block);
 
-    unsigned long long int *d_excess, *d_stash_excess;
-    int *d_dist, *d_cap, *d_flow, *d_stash_dist, *d_active_nodes;
+    int* d_dist_even;
+    int* d_dist_odd;
+    uint64_t *excess = (uint64_t*) malloc(N * sizeof(uint64_t));
 
-    // Allocate memory for vectors on device
-    cudaMalloc(&d_dist, N * sizeof(int));
-    cudaMalloc(&d_cap, N * N * sizeof(int));
-    cudaMalloc(&d_flow, N * N * sizeof(int));
-    cudaMalloc(&d_stash_dist, N * sizeof(int));
-    cudaMalloc(&d_active_nodes, N * sizeof(int));
-    cudaMalloc(&d_excess, N * sizeof(unsigned long long));
-    cudaMalloc(&d_stash_excess, N * sizeof(unsigned long long));
-    cudaMemcpy(d_cap, h_cap, sizeof(int) * N * N, cudaMemcpyHostToDevice);
+    unsigned long long int* d_excess;
+    unsigned long long int* d_stash_excess;
+    int* d_cap;
+    int* d_flow;
+    int* d_stash_send;
+    GPUErrChk(cudaMalloc(&d_dist_even, sizeof(int) * N));
+    GPUErrChk(cudaMalloc(&d_dist_odd, sizeof(int) * N));
+    cudaMalloc(&d_excess, sizeof(long long int) * N);
+    cudaMalloc(&d_stash_excess, sizeof(long long int) * N);
 
+    cudaMalloc(&d_cap, sizeof(int) * N * N);
+    cudaMalloc(&d_flow, sizeof(int) * N * N);
+    cudaMalloc(&d_stash_send, sizeof(int) * N * N);
+
+    cudaMemset(d_dist_even, 0, sizeof(int) * N);
+    cudaMemset(d_stash_send, 0, sizeof(int) * N * N);
+    cudaMemcpy(d_cap, cap, sizeof(int) * N * N, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_flow, flow, sizeof(int) * N * N, cudaMemcpyHostToDevice);
+
+    //GPUErrChk(cudaDeviceSynchronize());
     // PreFlow.
-    pre_flow<<<blocks_per_grid, threads_per_block>>>(d_dist, d_excess, d_cap, d_flow, N, src);
+    pre_flow<<<blocks, threads>>>(d_dist_even, d_excess, d_cap, d_flow, N, src);
 
-    // Initialize nodes.
-    for (auto u = 0 ; u < N ; u++) {
+    int* d_active_nodes;
+    cudaMalloc(&d_active_nodes, sizeof(int) * N);
+
+    int* active_nodes = (int*) malloc(N * sizeof(int));
+    int active_nodes_size = 0;
+
+    for (auto u = 0; u < N; u++) {
         if (u != src && u != sink) {
-            h_active_nodes.emplace_back(u);
+            active_nodes[active_nodes_size++] = u;
         }
     }
 
-    while (!h_active_nodes.empty()) {
-        int count = h_active_nodes.size();
+    cudaMemcpy(d_active_nodes, active_nodes, sizeof(int) * N, cudaMemcpyHostToDevice);
+    //GPUErrChk(cudaDeviceSynchronize());
+    auto round = 0;
+    auto iter = 0;
+    // Four-Stage Pulses.
+    while (active_nodes_size != 0) {
+        // Stage 1: push.
+        // Push Kernel.
+        int*& d_dist = (round == 0) ? d_dist_even : d_dist_odd;
+        int*& d_dist_stash = (round == 1) ? d_dist_even : d_dist_odd;
+        push<<<blocks, threads, 2 * N * sizeof(int)>>>(d_active_nodes, active_nodes_size, d_dist, d_excess, d_stash_send, d_cap, d_flow, N);
+        //GPUErrChk(cudaDeviceSynchronize());
 
-        // Stage 1. Push.
-        // Copu data from host to device
-        cudaMemcpy(d_active_nodes, h_active_nodes.data(), sizeof(int) * count, cudaMemcpyHostToDevice);
-        push<<<blocks_per_grid, threads_per_block>>>(count, d_active_nodes, d_dist, d_excess, d_stash_excess, N, src, d_cap, d_flow);
+        apply_push_stash<<<blocks, threads>>>(d_active_nodes, active_nodes_size, d_stash_excess, d_stash_send, d_flow, N);
+        //GPUErrChk(cudaDeviceSynchronize());
 
-        // Stage 2: relabel (update dist to stash_dist).
-        // Copu data from host to device
-        cudaMemcpy(d_stash_dist, d_dist, N * sizeof(int), cudaMemcpyDeviceToDevice);
-        relabel<<<blocks_per_grid, threads_per_block>>>(count, d_active_nodes, d_dist, d_excess, d_stash_dist,  N, src, d_cap, d_flow);
-
-        // Stage 3. Update
-        swap(d_dist, d_stash_dist);
+        // Stage 2, 3: relabel (update dist to stash_dist).
+        cudaMemcpy(d_dist_stash, d_dist, sizeof(int) * N, cudaMemcpyDeviceToDevice);
+        // Relabel Kernel.
+        relabel<<<blocks, threads>>>(d_active_nodes, active_nodes_size, d_excess, d_dist, d_dist_stash, d_cap, d_flow, N);
+        //GPUErrChk(cudaDeviceSynchronize());
 
         // Stage 4: apply excess-flow changes for destination vertices.
-        apply_changes<<<blocks_per_grid, threads_per_block>>>(N, d_excess, d_stash_excess);
-        // Copy results back
-        cudaMemcpy(h_excess, d_excess, sizeof(unsigned long long) * N, cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_flow, d_flow, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
+        update_excess<<<blocks, threads>>>(d_excess, d_stash_excess, N);
+        //GPUErrChk(cudaDeviceSynchronize());
 
         // Construct active nodes.
-        h_active_nodes.clear();
+        cudaMemcpy(excess, d_excess, sizeof(uint64_t) * N, cudaMemcpyDeviceToHost);
+        active_nodes_size = 0;
 
         for (auto u = 0; u < N; u++) {
-            if (h_excess[u] > 0 && u != src && u != sink) {
-                h_active_nodes.emplace_back(u);
+            if (excess[u] != 0 && u != src && u != sink) {
+                active_nodes[active_nodes_size++] = u;
             }
         }
+
+        if (active_nodes_size > 0) {
+            cudaMemcpy(d_active_nodes, active_nodes, sizeof(int) * N, cudaMemcpyHostToDevice);
+        }
+
+        round = 1 - round;
+
+        iter++;
     }
 
-    free(h_dist);
-    free(h_stash_dist);
-    free(h_excess);
-    free(h_stash_excess);
+    cudaMemcpy(flow, d_flow, sizeof(int) * N * N, cudaMemcpyDeviceToHost);
 
-    cudaFree(d_dist);
+    free(excess);
+    free(active_nodes);
+
     cudaFree(d_cap);
     cudaFree(d_flow);
-    cudaFree(d_stash_dist);
     cudaFree(d_active_nodes);
+    cudaFree(d_dist_odd);
+    cudaFree(d_dist_even);
     cudaFree(d_excess);
     cudaFree(d_stash_excess);
+    cudaFree(d_stash_send);
 
     return 0;
 }
